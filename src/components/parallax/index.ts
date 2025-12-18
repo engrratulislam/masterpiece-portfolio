@@ -1,0 +1,6 @@
+export { default as ParallaxContainer } from './ParallaxContainer'
+export { default as ParallaxLayer } from './ParallaxLayer'
+export { default as ParallaxSection } from './ParallaxSection'
+export { default as ParallaxHero } from './ParallaxHero'
+export { default as ParallaxText } from './ParallaxText'
+export { default as ParallaxNav } from './ParallaxNav'

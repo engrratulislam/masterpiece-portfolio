@@ -1,4 +1,1232 @@
-# Next.js Masterpiece Portfolio - Complete Implementation Guide
+### Updated Hero Section with Advanced Parallax
+
+**File: `src/components/sections/Hero.tsx`**
+
+```typescript
+'use client'
+
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { ArrowDown, Github, Linkedin, Mail } from 'lucide-react'
+import { useRef } from 'react'
+import Scene3D from '@/components/three/Scene'
+import FloatingElements from '@/components/animations/FloatingElements'
+import TextSplitReveal from '@/components/animations/TextSplitReveal'
+import MagneticHover from '@/components/animations/MagneticHover'
+
+export default function Hero() {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start start', 'end start'],
+  })
+
+  // Parallax transformations
+  const y1 = useTransform(scrollYProgress, [0, 1], ['0%', '50%'])
+  const y2 = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
+  const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0])
+  const scale = useTransform(scrollYProgress, [0, 1], [1, 0.8])
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.3,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { y: 40, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { duration: 0.8, ease: [0.6, -0.05, 0.01, 0.99] },
+    },
+  }
+
+  return (
+    <section ref={ref} className="relative h-screen flex items-center justify-center overflow-hidden">
+      {/* Floating Background Elements */}
+      <FloatingElements />
+
+      {/* 3D Background - Layer 1 */}
+      <motion.div style={{ y: y1 }} className="absolute inset-0 z-0">
+        <Scene3D />
+      </motion.div>
+
+      {/* Gradient Overlay - Layer 2 */}
+      <motion.div 
+        style={{ y: y2, opacity }}
+        className="absolute inset-0 bg-gradient-to-b from-dark-900/50 via-dark-900/70 to-dark-900 z-10" 
+      />
+
+      {/* Content - Layer 3 */}
+      <motion.div
+        style={{ scale, opacity }}
+        className="relative z-20 container mx-auto px-4 text-center"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <motion.div variants={itemVariants} className="mb-6">
+          <motion.span
+            className="inline-block px-4 py-2 bg-primary-500/10 border border-primary-500/30 rounded-full text-primary-400 text-sm font-medium"
+            whileHover={{ scale: 1.05, borderColor: 'rgba(14, 165, 233, 0.5)' }}
+            transition={{ type: 'spring', stiffness: 400 }}
+          >
+            👋 Welcome to my portfolio
+          </motion.span>
+        </motion.div>
+
+        <motion.div variants={itemVariants} className="mb-6">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold font-display">
+            <TextSplitReveal 
+              text="Hi, I'm" 
+              className="block mb-2"
+              type="chars"
+            />
+            <TextSplitReveal
+              text="Your Name"
+              className="block bg-gradient-to-r from-primary-500 via-purple-500 to-pink-500 bg-clip-text text-transparent"
+              type="chars"
+              delay={0.3}
+            />
+          </h1>
+        </motion.div>
+
+        <motion.p
+          variants={itemVariants}
+          className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl mx-auto"
+        >
+          Full-Stack Developer & Creative Designer crafting beautiful digital experiences
+        </motion.p>
+
+        <motion.div
+          variants={itemVariants}
+          className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12"
+        >
+          <MagneticHover strength={15}>
+            <motion.a
+              href="#projects"
+              className="px-8 py-4 bg-primary-500 rounded-lg font-medium hover:bg-primary-600 transition-colors w-full sm:w-auto relative overflow-hidden group"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className="relative z-10">View My Work</span>
+              <motion.div
+                className="absolute inset-0 bg-primary-600"
+                initial={{ x: '-100%' }}
+                whileHover={{ x: 0 }}
+                transition={{ duration: 0.3 }}
+              />
+            </motion.a>
+          </MagneticHover>
+
+          <MagneticHover strength={15}>
+            <motion.a
+              href="#contact"
+              className="px-8 py-4 border-2 border-white/20 rounded-lg font-medium hover:bg-white/10 transition-colors w-full sm:w-auto"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Get In Touch
+            </motion.a>
+          </MagneticHover>
+        </motion.div>
+
+        <motion.div
+          variants={itemVariants}
+          className="flex items-center justify-center gap-4"
+        >
+          {[
+            { Icon: Github, href: 'https://github.com', color: '#333' },
+            { Icon: Linkedin, href: 'https://linkedin.com', color: '#0077b5' },
+            { Icon: Mail, href: 'mailto:your@email.com', color: '#ea4335' },
+          ].map(({ Icon, href, color }, index) => (
+            <MagneticHover key={index} strength={10}>
+              <motion.a
+                href={href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-3 rounded-lg bg-white/5 hover:bg-white/10 transition-colors relative overflow-hidden group"
+                whileHover={{ scale: 1.1, rotate: 5 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                <Icon className="w-6 h-6 relative z-10" />
+                <motion.div
+                  className="absolute inset-0 opacity-20"
+                  style={{ backgroundColor: color }}
+                  initial={{ scale: 0 }}
+                  whileHover={{ scale: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+              </motion.a>
+            </MagneticHover>
+          ))}
+        </motion.div>
+      </motion.div>
+
+      {/* Scroll Indicator with Animation */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-20"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1, duration: 0.6 }}
+        style={{ opacity }}
+      >
+        <motion.div
+          animate={{ y: [0, 10, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+          className="flex flex-col items-center gap-2"
+        >
+          <span className="text-xs text-white/60 uppercase tracking-wider">Scroll</span>
+          <ArrowDown className="w-6 h-6 text-white/60" />
+        </motion.div>
+      </motion.div>
+    </section>
+  )
+}
+```
+
+### Enhanced Projects Section with Parallax Cards
+
+**File: `src/components/sections/Projects.tsx`**
+
+```typescript
+'use client'
+
+import { useState } from 'react'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
+import Image from 'next/image'
+import { ExternalLink, Github } from 'lucide-react'
+import { projects } from '@/data/projects'
+import Card3D from '@/components/animations/Card3D'
+import GSAPScrollTrigger from '@/components/animations/GSAPScrollTrigger'
+import TextSplitReveal from '@/components/animations/TextSplitReveal'
+import StaggerRevealGrid from '@/components/animations/StaggerRevealGrid'
+
+export default function Projects() {
+  const [filter, setFilter] = useState('all')
+  const sectionRef = useRef(null)
+  const categories = ['all', 'web', 'mobile', 'design', '3d']
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start end', 'end start'],
+  })
+
+  const backgroundY = useTransform(scrollYProgress, [0, 1], ['0%', '20%'])
+
+  const filteredProjects = filter === 'all' 
+    ? projects 
+    : projects.filter(p => p.category === filter)
+
+  return (
+    <section id="projects" ref={sectionRef} className="relative py-20 md:py-32 bg-dark-800 overflow-hidden">
+      {/* Animated Background */}
+      <motion.div 
+        style={{ y: backgroundY }}
+        className="absolute inset-0 opacity-5"
+      >
+        <div className="absolute top-20 left-10 w-96 h-96 bg-primary-500 rounded-full filter blur-3xl" />
+        <div className="absolute bottom-20 right-10 w-96 h-96 bg-purple-500 rounded-full filter blur-3xl" />
+      </motion.div>
+
+      <div className="container mx-auto px-4 relative z-10">
+        {/* Section Header */}
+        <GSAPScrollTrigger animation="slideUp">
+          <div className="text-center mb-12">
+            <TextSplitReveal
+              text="Featured Projects"
+              className="text-4xl md:text-5xl font-bold font-display mb-4"
+            />
+            <motion.p
+              className="text-gray-400 text-lg max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3 }}
+            >
+              Showcasing my best work in web development, design, and creative coding
+            </motion.p>
+          </div>
+        </GSAPScrollTrigger>
+
+        {/* Category Filter */}
+        <motion.div
+          className="flex flex-wrap justify-center gap-3 mb-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+        >
+          {categories.map((category) => (
+            <motion.button
+              key={category}
+              onClick={() => setFilter(category)}
+              className={`px-6 py-2 rounded-lg font-medium capitalize transition-all relative overflow-hidden ${
+                filter === category
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-white/5 text-gray-400 hover:bg-white/10'
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              {filter === category && (
+                <motion.div
+                  layoutId="categoryBg"
+                  className="absolute inset-0 bg-primary-500"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10">{category}</span>
+            </motion.button>
+          ))}
+        </motion.div>
+
+        {/* Projects Grid with Stagger */}
+        <StaggerRevealGrid columns={3} gap={6}>
+          {filteredProjects.map((project, index) => (
+            <Card3D key={project.id} className="group relative bg-dark-900 rounded-xl overflow-hidden hover:shadow-2xl hover:shadow-primary-500/20 transition-all">
+              {/* Project Image with Parallax */}
+              <div className="relative h-64 overflow-hidden">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  <Image
+                    src={project.image}
+                    alt={project.title}
+                    fill
+                    className="object-cover"
+                  />
+                </motion.div>
+                <div className="absolute inset-0 bg-gradient-to-t from-dark-900 via-dark-900/50 to-transparent opacity-60" />
+                
+                {/* Hover Overlay */}
+                <motion.div
+                  className="absolute inset-0 bg-primary-500/20 flex items-center justify-center gap-4"
+                  initial={{ opacity: 0 }}
+                  whileHover={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {project.liveUrl && (
+                    <motion.a
+                      href={project.liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 bg-white rounded-full"
+                      whileHover={{ scale: 1.1, rotate: 10 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <ExternalLink className="w-5 h-5 text-dark-900" />
+                    </motion.a>
+                  )}
+                  {project.githubUrl && (
+                    <motion.a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 bg-white rounded-full"
+                      whileHover={{ scale: 1.1, rotate: -10 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <Github className="w-5 h-5 text-dark-900" />
+                    </motion.a>
+                  )}
+                </motion.div>
+              </div>
+
+              {/* Project Info */}
+              <div className="p-6">
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
+                  {project.tags.slice(0, 3).map((tag, i) => (
+                    <motion.span
+                      key={i}
+                      className="px-3 py-1 bg-primary-500/10 text-primary-400 text-xs rounded-full"
+                      whileHover={{ scale: 1.1 }}
+                    >
+                      {tag}
+                    </motion.span>
+                  ))}
+                </div>
+
+                <h3 className="text-xl font-bold mb-2 group-hover:text-primary-500 transition-colors">
+                  {project.title}
+                </h3>
+                <p className="text-gray-400 text-sm mb-4 line-clamp-2">
+                  {project.description}
+                </p>
+
+                <motion.div
+                  className="h-1 bg-gradient-to-r from-primary-500 to-purple-500 rounded-full"
+                  initial={{ width: 0 }}
+                  whileInView={{ width: '100%' }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1, delay: index * 0.1 }}
+                />
+              </div>
+            </Card3D>
+          ))}
+        </StaggerRevealGrid>
+      </div>
+    </section>
+  )
+}
+```
+
+---
+
+## 🎨 Advanced Animation Patterns
+
+### Pattern 1: Scroll-Linked Animations
+
+```typescript
+// Use in any component for scroll-based effects
+const { scrollYProgress } = useScroll({
+  target: ref,
+  offset: ['start end', 'end start']
+})
+
+// Transform properties
+const y = useTransform(scrollYProgress, [0, 1], [0, 200])
+const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 0])
+const scale = useTransform(scrollYProgress, [0, 0.5, 1], [0.8, 1, 0.8])
+const rotate = useTransform(scrollYProgress, [0, 1], [0, 360])
+```
+
+### Pattern 2: Intersection Observer Animations
+
+```typescript
+// Trigger animations when element enters viewport
+const controls = useAnimation()
+const ref = useRef(null)
+const inView = useInView(ref, { once: true, amount: 0.3 })
+
+useEffect(() => {
+  if (inView) {
+    controls.start('visible')
+  }
+}, [controls, inView])
+```
+
+### Pattern 3: Gesture-Based Interactions
+
+```typescript
+// Drag, hover, tap interactions
+<motion.div
+  drag
+  dragConstraints={{ left: -100, right: 100, top: -100, bottom: 100 }}
+  dragElastic={0.2}
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+  whileDrag={{ scale: 1.1 }}
+/>
+```
+
+### Pattern 4: Morphing Shapes
+
+```typescript
+// SVG path morphing
+<motion.path
+  d={isExpanded ? expandedPath : collapsedPath}
+  transition={{ duration: 0.6, ease: 'easeInOut' }}
+/>
+```
+
+---
+
+## 💫 Complete Animated Page Example
+
+**File: `src/app/page.tsx`**
+
+```typescript
+'use client'
+
+import { useEffect } from 'react'
+import Hero from '@/components/sections/Hero'
+import About from '@/components/sections/About'
+import Projects from '@/components/sections/Projects'
+import Skills from '@/components/sections/Skills'
+import Experience from '@/components/sections/Experience'
+import Contact from '@/components/sections/Contact'
+import ScrollProgress from '@/components/animations/ScrollProgress'
+import FloatingElements from '@/components/animations/FloatingElements'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
+
+export default function Home() {
+  useEffect(() => {
+    // Page load animation
+    gsap.from('body', {
+      opacity: 0,
+      duration: 1,
+      ease: 'power2.out',
+    })
+
+    // Horizontal scroll sections (optional)
+    const sections = gsap.utils.toArray('.horizontal-section')
+    if (sections.length > 0) {
+      gsap.to(sections, {
+        xPercent: -100 * (sections.length - 1),
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.horizontal-container',
+          pin: true,
+          scrub: 1,
+          snap: 1 / (sections.length - 1),
+          end: () => '+=' + document.querySelector('.horizontal-container')?.offsetWidth,
+        },
+      })
+    }
+  }, [])
+
+  return (
+    <>
+      <ScrollProgress />
+      <FloatingElements />
+      
+      <Hero />
+      <About />
+      <Projects />
+      <Skills />
+      <Experience />
+      <Contact />
+    </>
+  )
+}
+```
+
+---
+
+## 🎯 Animation Best Practices
+
+### Performance Optimization
+
+```typescript
+// ✅ Use transform and opacity for animations (GPU-accelerated)
+<motion.div
+  animate={{ x: 100, opacity: 0.5 }}  // Good
+/>
+
+// ❌ Avoid animating layout properties
+<motion.div
+  animate={{ left: 100, marginTop: 50 }}  // Bad
+/>
+
+// ✅ Use will-change for better performance
+<motion.div
+  style={{ willChange: 'transform' }}
+/>
+
+// ✅ Disable animations on low-end devices
+const prefersReducedMotion = useReducedMotion()
+const variants = {
+  hidden: { opacity: prefersReducedMotion ? 1 : 0 },
+  visible: { opacity: 1 }
+}
+```
+
+### Reduce Motion Hook
+
+**File: `src/lib/hooks/useReducedMotion.ts`**
+
+```typescript
+'use client'
+
+import { useState, useEffect } from 'react'
+
+export function useReducedMotion(): boolean {
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false)
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setPrefersReducedMotion(mediaQuery.matches)
+
+    const handleChange = () => {
+      setPrefersReducedMotion(mediaQuery.matches)
+    }
+
+    mediaQuery.addEventListener('change', handleChange)
+    return () => mediaQuery.removeEventListener('change', handleChange)
+  }, [])
+
+  return prefersReducedMotion
+}
+```
+
+### Animation Timing
+
+```typescript
+// Define consistent timing values
+export const ANIMATION_TIMINGS = {
+  fast: 0.2,
+  normal: 0.4,
+  slow: 0.6,
+  verySlow: 1.0,
+}
+
+export const EASING = {
+  easeOut: [0.6, -0.05, 0.01, 0.99],
+  easeInOut: [0.43, 0.13, 0.23, 0.96],
+  spring: { type: 'spring', stiffness: 100, damping: 15 },
+}
+```
+
+---
+
+## 📦 Complete Package.json
+
+**File: `package.json`**
+
+```json
+{
+  "name": "portfolio-masterpiece",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbo",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.{js,jsx,ts,tsx,json,css,md}\"",
+    "analyze": "ANALYZE=true next build"
+  },
+  "dependencies": {
+    "next": "^14.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "framer-motion": "^10.16.4",
+    "three": "^0.158.0",
+    "@react-three/fiber": "^8.15.11",
+    "@react-three/drei": "^9.88.17",
+    "@studio-freight/lenis": "^1.0.27",
+    "gsap": "^3.12.2",
+    "lucide-react": "^0.292.0",
+    "clsx": "^2.0.0",
+    "tailwind-merge": "^2.0.0",
+    "react-type-animation": "^3.2.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "@types/react": "^18.2.37",
+    "@types/node": "^20.9.0",
+    "@types/three": "^0.158.0",
+    "tailwindcss": "^3.3.5",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "eslint": "^8.53.0",
+    "eslint-config-next": "^14.0.0",
+    "prettier": "^3.1.0",
+    "@next/bundle-analyzer": "^14.0.0"
+  }
+}
+```
+
+---
+
+## 🎨 Complete Tailwind Config
+
+**File: `tailwind.config.ts`**
+
+```typescript
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: {
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+          950: '#082f49',
+        },
+        dark: {
+          50: '#fafafa',
+          100: '#f5f5f5',
+          200: '#e5e5e5',
+          300: '#d4d4d4',
+          400: '#a3a3a3',
+          500: '#737373',
+          600: '#525252',
+          700: '#404040',
+          800: '#1a1a1a',
+          900: '#0a0a0a',
+          950: '#050505',
+        },
+      },
+      fontFamily: {
+        sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        display: ['var(--font-space-grotesk)', 'system-ui', 'sans-serif'],
+        mono: ['var(--font-fira-code)', 'monospace'],
+      },
+      animation: {
+        'fade-in': 'fadeIn 0.6s ease-out',
+        'fade-out': 'fadeOut 0.6s ease-out',
+        'slide-up': 'slideUp 0.6s ease-out',
+        'slide-down': 'slideDown 0.6s ease-out',
+        'slide-left': 'slideLeft 0.6s ease-out',
+        'slide-right': 'slideRight 0.6s ease-out',
+        'scale-in': 'scaleIn 0.4s ease-out',
+        'scale-out': 'scaleOut 0.4s ease-out',
+        'float': 'float 3s ease-in-out infinite',
+        'pulse-slow': 'pulse 3s ease-in-out infinite',
+        'spin-slow': 'spin 3s linear infinite',
+        'gradient': 'gradient 8s linear infinite',
+        'shimmer': 'shimmer 2s linear infinite',
+        'bounce-slow': 'bounce 2s ease-in-out infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        fadeOut: {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        slideUp: {
+          '0%': { transform: 'translateY(20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideDown: {
+          '0%': { transform: 'translateY(-20px)', opacity: '0' },
+          '100%': { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideLeft: {
+          '0%': { transform: 'translateX(20px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        slideRight: {
+          '0%': { transform: 'translateX(-20px)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
+        },
+        scaleIn: {
+          '0%': { transform: 'scale(0.9)', opacity: '0' },
+          '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        scaleOut: {
+          '0%': { transform: 'scale(1)', opacity: '1' },
+          '100%': { transform: 'scale(0.9)', opacity: '0' },
+        },
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' },
+        },
+        gradient: {
+          '0%, 100%': { backgroundPosition: '0% 50%' },
+          '50%': { backgroundPosition: '100% 50%' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-1000px 0' },
+          '100%': { backgroundPosition: '1000px 0' },
+        },
+      },
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'gradient-conic': 'conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))',
+      },
+      boxShadow: {
+        'glow': '0 0 20px rgba(14, 165, 233, 0.3)',
+        'glow-lg': '0 0 40px rgba(14, 165, 233, 0.4)',
+        'inner-glow': 'inset 0 0 20px rgba(14, 165, 233, 0.2)',
+      },
+    },
+  },
+  plugins: [],
+}
+
+export default config
+```
+
+---
+
+## 🔐 Environment Variables
+
+**File: `.env.example`**
+
+```bash
+# Site Configuration
+NEXT_PUBLIC_SITE_URL=https://yourportfolio.com
+NEXT_PUBLIC_SITE_NAME=Your Name Portfolio
+
+# Analytics
+NEXT_PUBLIC_GOOGLE_ANALYTICS_ID=G-XXXXXXXXXX
+NEXT_PUBLIC_VERCEL_ANALYTICS_ID=your_vercel_id
+
+# Email Service (Choose one)
+# SendGrid
+SENDGRID_API_KEY=SG.xxxxxxxxxxxxx
+EMAIL_FROM=noreply@yourportfolio.com
+
+# Resend
+RESEND_API_KEY=re_xxxxxxxxxxxxx
+
+# Nodemailer (SMTP)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=your@email.com
+SMTP_PASSWORD=your_app_password
+
+# Contact Information
+NEXT_PUBLIC_EMAIL=your@email.com
+NEXT_PUBLIC_PHONE=+880 1234-567890
+NEXT_PUBLIC_LOCATION=Dhaka, Bangladesh
+
+# Social Media
+NEXT_PUBLIC_GITHUB=https://github.com/yourusername
+NEXT_PUBLIC_LINKEDIN=https://linkedin.com/in/yourusername
+NEXT_PUBLIC_TWITTER=https://twitter.com/yourusername
+
+# Database (Optional)
+DATABASE_URL=postgresql://user:password@host:port/database
+
+# Rate Limiting
+RATE_LIMIT_MAX_REQUESTS=5
+RATE_LIMIT_WINDOW_MS=60000
+
+# Feature Flags
+NEXT_PUBLIC_ENABLE_3D=true
+NEXT_PUBLIC_ENABLE_ANALYTICS=true
+```
+
+---
+
+## 🚀 Advanced Deployment Guide
+
+### Vercel Deployment (Recommended)
+
+**Step 1: Prepare for Deployment**
+
+```bash
+# 1. Create production build locally
+npm run build
+
+# 2. Test production build
+npm start
+
+# 3. Check for errors
+npm run type-check
+npm run lint
+
+# 4. Commit changes
+git add .
+git commit -m "feat: ready for deployment"
+git push origin main
+```
+
+**Step 2: Deploy to Vercel**
+
+```bash
+# Install Vercel CLI
+npm i -g vercel
+
+# Login
+vercel login
+
+# Deploy (first time)
+vercel
+
+# Follow prompts:
+# - Link to existing project? No
+# - Project name: portfolio-masterpiece
+# - Directory: ./
+# - Override settings? No
+
+# Deploy to production
+vercel --prod
+```
+
+**Step 3: Configure Environment Variables**
+
+In Vercel Dashboard:
+1. Go to Project Settings → Environment Variables
+2. Add all variables from `.env.example`
+3. Select environments: Production, Preview, Development
+4. Redeploy after adding variables
+
+**Step 4: Configure Custom Domain**
+
+```bash
+# Add domain via CLI
+vercel domains add yourdomain.com
+
+# Or in Vercel Dashboard:
+# Settings → Domains → Add Domain
+```
+
+### Alternative: Deploy to Netlify
+
+**File: `netlify.toml`**
+
+```toml
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  NODE_VERSION = "18"
+```
+
+```bash
+# Install Netlify CLI
+npm i -g netlify-cli
+
+# Login
+netlify login
+
+# Deploy
+netlify deploy --prod
+```
+
+---
+
+## 📊 Analytics Integration
+
+### Google Analytics 4
+
+**File: `src/lib/analytics/gtag.ts`**
+
+```typescript
+export const GA_TRACKING_ID = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID
+
+// https://developers.google.com/analytics/devguides/collection/gtagjs/pages
+export const pageview = (url: string) => {
+  if (typeof window.gtag !== 'undefined') {
+    window.gtag('config', GA_TRACKING_ID!, {
+      page_path: url,
+    })
+  }
+}
+
+// https://developers.google.com/analytics/devguides/collection/gtagjs/events
+export const event = ({ action, category, label, value }: {
+  action: string
+  category: string
+  label?: string
+  value?: number
+}) => {
+  if (typeof window.gtag !== 'undefined') {
+    window.gtag('event', action, {
+      event_category: category,
+      event_label: label,
+      value: value,
+    })
+  }
+}
+
+// Track custom events
+export const trackEvent = {
+  projectView: (projectName: string) => {
+    event({
+      action: 'view_project',
+      category: 'Projects',
+      label: projectName,
+    })
+  },
+  formSubmit: (formName: string) => {
+    event({
+      action: 'submit_form',
+      category: 'Contact',
+      label: formName,
+    })
+  },
+  downloadResume: () => {
+    event({
+      action: 'download_resume',
+      category: 'About',
+      label: 'Resume PDF',
+    })
+  },
+  socialClick: (platform: string) => {
+    event({
+      action: 'click_social',
+      category: 'Social',
+      label: platform,
+    })
+  },
+}
+```
+
+**Update `src/app/layout.tsx`:**
+
+```typescript
+import Script from 'next/script'
+import { GA_TRACKING_ID } from '@/lib/analytics/gtag'
+
+// Add in head section
+{GA_TRACKING_ID && (
+  <>
+    <Script
+      src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
+      strategy="afterInteractive"
+    />
+    <Script id="google-analytics" strategy="afterInteractive">
+      {`
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', '${GA_TRACKING_ID}', {
+          page_path: window.location.pathname,
+        });
+      `}
+    </Script>
+  </>
+)}
+```
+
+### Track Page Views
+
+**File: `src/components/analytics/RouteChangeTracker.tsx`**
+
+```typescript
+'use client'
+
+import { useEffect } from 'react'
+import { usePathname, useSearchParams } from 'next/navigation'
+import { pageview } from '@/lib/analytics/gtag'
+
+export default function RouteChangeTracker() {
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+
+  useEffect(() => {
+    const url = pathname + searchParams.toString()
+    pageview(url)
+  }, [pathname, searchParams])
+
+  return null
+}
+```
+
+---
+
+## 🧪 Testing Guide
+
+### Manual Testing Checklist
+
+```markdown
+## Browser Testing
+- [ ] Chrome (latest)
+- [ ] Firefox (latest)
+- [ ] Safari (latest)
+- [ ] Edge (latest)
+- [ ] Mobile Safari (iOS)
+- [ ] Chrome Mobile (Android)
+
+## Device Testing
+- [ ] Desktop (1920x1080)
+- [ ] Laptop (1366x768)
+- [ ] Tablet (768x1024)
+- [ ] Mobile (375x667)
+- [ ] Large Mobile (414x896)
+
+## Functionality Testing
+- [ ] Navigation works (all links)
+- [ ] Mobile menu opens/closes
+- [ ] Smooth scrolling
+- [ ] 3D scene loads
+- [ ] Animations trigger
+- [ ] Project filtering
+- [ ] Contact form validation
+- [ ] Form submission
+- [ ] Resume download
+- [ ] External links open in new tab
+- [ ] Social media links work
+
+## Performance Testing
+- [ ] Lighthouse score > 90
+- [ ] FCP < 1.8s
+- [ ] LCP < 2.5s
+- [ ] TTI < 3.8s
+- [ ] CLS < 0.1
+- [ ] No console errors
+- [ ] Images lazy load
+- [ ] 3D scene optimized
+
+## Accessibility Testing
+- [ ] Keyboard navigation
+- [ ] Tab order logical
+- [ ] Focus indicators visible
+- [ ] Alt text on images
+- [ ] Proper heading hierarchy
+- [ ] Color contrast WCAG AA
+- [ ] Screen reader friendly
+- [ ] ARIA labels present
+
+## SEO Testing
+- [ ] Meta tags present
+- [ ] OG tags work
+- [ ] Twitter cards work
+- [ ] Sitemap generates
+- [ ] Robots.txt configured
+- [ ] Canonical URLs set
+```
+
+### Automated Testing (Optional)
+
+**File: `__tests__/components/Button.test.tsx`**
+
+```typescript
+import { render, screen, fireEvent } from '@testing-library/react'
+import Button from '@/components/ui/Button'
+
+describe('Button', () => {
+  it('renders button with text', () => {
+    render(<Button>Click me</Button>)
+    expect(screen.getByText('Click me')).toBeInTheDocument()
+  })
+
+  it('calls onClick when clicked', () => {
+    const handleClick = jest.fn()
+    render(<Button onClick={handleClick}>Click me</Button>)
+    fireEvent.click(screen.getByText('Click me'))
+    expect(handleClick).toHaveBeenCalledTimes(1)
+  })
+
+  it('is disabled when disabled prop is true', () => {
+    render(<Button disabled>Click me</Button>)
+    expect(screen.getByText('Click me')).toBeDisabled()
+  })
+})
+```
+
+---
+
+## 🎓 Learning Resources & References
+
+### Official Documentation
+- **Next.js**: https://nextjs.org/docs
+- **React**: https://react.dev/learn
+- **TypeScript**: https://www.typescriptlang.org/docs
+- **Tailwind CSS**: https://tailwindcss.com/docs
+- **Framer Motion**: https://www.framer.com/motion
+- **Three.js**: https://threejs.org/docs
+- **React Three Fiber**: https://docs.pmnd.rs/react-three-fiber
+
+### Tutorials & Courses
+- **Next.js Learn**: https://nextjs.org/learn
+- **Three.js Journey**: https://threejs-journey.com
+- **Web.dev**: https://web.dev/learn
+- **Frontend Masters**: https://frontendmasters.com
+- **Egghead.io**: https://egghead.io
+
+### Design Resources
+- **Awwwards**: https://www.awwwards.com
+- **Dribbble**: https://dribbble.com
+- **Behance**: https://www.behance.net
+- **CodePen**: https://codepen.io
+- **CSS Design Awards**: https://www.cssdesignawards.com
+
+### Tools & Utilities
+- **Can I Use**: https://caniuse.com
+- **Squoosh**: https://squoosh.app (Image optimization)
+- **SVGOMG**: https://jakearchibald.github.io/svgomg (SVG optimization)
+- **PageSpeed Insights**: https://pagespeed.web.dev
+- **WebPageTest**: https://www.webpagetest.org
+
+---
+
+## 📚 Appendix
+
+### Glossary
+
+- **FCP**: First Contentful Paint
+- **LCP**: Largest Contentful Paint
+- **TTI**: Time to Interactive
+- **CLS**: Cumulative Layout Shift
+- **FID**: First Input Delay
+- **TTFB**: Time to First Byte
+- **SSR**: Server-Side Rendering
+- **SSG**: Static Site Generation
+- **ISR**: Incremental Static Regeneration
+- **CSR**: Client-Side Rendering
+
+### Common Issues & Solutions
+
+See [Troubleshooting](#troubleshooting) section above.
+
+### Version History
+
+- **v1.0.0** (October 2024) - Initial release with complete documentation
+
+---
+
+## 🎉 Conclusion
+
+This comprehensive guide provides everything needed to build a world-class portfolio website with Next.js, combining modern animations, 3D effects, and advanced parallax scrolling inspired by Design Monks and Dave Gamache's demo.
+
+### Key Takeaways
+
+✅ **Modern Stack**: Next.js 14, TypeScript, Tailwind CSS
+✅ **Advanced Animations**: Framer Motion, GSAP, multi-layer parallax
+✅ **3D Effects**: Three.js with React Three Fiber
+✅ **Performance**: Optimized for 90+ Lighthouse scores
+✅ **Responsive**: Mobile-first design approach
+✅ **SEO Ready**: Complete metadata and structured data
+✅ **Production Ready**: Deployment guides and monitoring
+
+### Final Checklist
+
+Before launching:
+- [ ] All content is accurate and up-to-date
+- [ ] Images are optimized (AVIF/WebP)
+- [ ] Forms are working and tested
+- [ ] Analytics are configured
+- [ ] SEO is optimized
+- [ ] Performance scores > 90
+- [ ] Tested on multiple devices
+- [ ] Domain is configured
+- [ ] SSL certificate is active
+- [ ] Backup and monitoring set up
+
+### Support & Updates
+
+For questions, issues, or contributions:
+- GitHub Issues: [Create an issue](https://github.com/yourusername/portfolio)
+- Email: your@email.com
+- Twitter: [@yourusername](https://twitter.com/yourusername)
+
+**Remember**: Your portfolio is a living project. Keep it updated with your latest work, optimize continuously, and iterate based on user feedback.
+
+**Good luck building your masterpiece! 🚀✨**
+
+---
+
+**Document Information:**
+- **Version**: 2.0.0 (Enhanced with Advanced Parallax & Animations)
+- **Last Updated**: October 2024
+- **Author**: Portfolio Development Team
+- **Status**: Production Ready with Advanced Features
+- **License**: MIT
+
+---
+
+*This documentation is maintained and updated regularly. For the latest version, check the repository.*# Next.js Masterpiece Portfolio - Complete Implementation Guide
 
 ## 🎯 Project Overview
 
@@ -77,7 +1305,10 @@ This document provides a comprehensive guide to building a world-class portfolio
 
 ```bash
 # Create new Next.js project with TypeScript
-npx create-next-app@latest --typescript --tailwind --app --use-npm
+npx create-next-app@latest portfolio-masterpiece --typescript --tailwind --app --use-npm
+
+# Navigate to project
+cd portfolio-masterpiece
 
 # Install additional dependencies
 npm install framer-motion three @react-three/fiber @react-three/drei gsap lenis lucide-react clsx tailwind-merge
@@ -835,11 +2066,610 @@ export default function Projects() {
 
 ---
 
-## 🎬 Animation System
+## 🎬 Advanced Animation & Parallax System
 
-### Smooth Scroll Component
+> **Inspiration**: This section incorporates advanced parallax effects from Dave Gamache's demo and sophisticated animations from Design Monks to create a truly immersive, animated portfolio experience.
 
-**File: `src/components/animations/SmoothScroll.tsx`**
+### Key Animation Features to Implement:
+
+1. **Multi-Layer Parallax Scrolling** - Different elements move at different speeds
+2. **Scroll-Triggered Animations** - Elements animate in/out based on scroll position
+3. **3D Transforms & Depth** - Create dimensional effects with CSS 3D
+4. **Magnetic Hover Effects** - Elements react to mouse movement
+5. **Smooth Page Transitions** - Fluid animations between sections
+6. **Floating & Rotating Elements** - Background objects with continuous motion
+7. **Text Reveal Animations** - Words/characters animate individually
+8. **Image Scaling & Parallax** - Images zoom and move on scroll
+
+### Advanced Multi-Layer Parallax
+
+**File: `src/components/animations/MultiLayerParallax.tsx`**
+
+```typescript
+'use client'
+
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useRef, ReactNode } from 'react'
+
+interface Layer {
+  children: ReactNode
+  speed: number // 0.1 to 2 (higher = faster movement)
+  zIndex?: number
+  className?: string
+}
+
+interface MultiLayerParallaxProps {
+  layers: Layer[]
+}
+
+export default function MultiLayerParallax({ layers }: MultiLayerParallaxProps) {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  })
+
+  return (
+    <div ref={ref} className="relative w-full h-screen overflow-hidden">
+      {layers.map((layer, index) => {
+        const y = useTransform(
+          scrollYProgress,
+          [0, 1],
+          [0, layer.speed * -200]
+        )
+
+        return (
+          <motion.div
+            key={index}
+            style={{ y, zIndex: layer.zIndex || index }}
+            className={`absolute inset-0 ${layer.className || ''}`}
+          >
+            {layer.children}
+          </motion.div>
+        )
+      })}
+    </div>
+  )
+}
+```
+
+### GSAP ScrollTrigger Integration
+
+**File: `src/components/animations/GSAPScrollTrigger.tsx`**
+
+```typescript
+'use client'
+
+import { useEffect, useRef } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+
+gsap.registerPlugin(ScrollTrigger)
+
+interface GSAPScrollTriggerProps {
+  children: React.ReactNode
+  animation?: 'fade' | 'slideUp' | 'slideLeft' | 'scale' | 'rotate' | 'custom'
+  customAnimation?: gsap.TweenVars
+  trigger?: string
+  start?: string
+  end?: string
+  scrub?: boolean | number
+  markers?: boolean
+}
+
+export default function GSAPScrollTrigger({
+  children,
+  animation = 'fade',
+  customAnimation,
+  trigger,
+  start = 'top 80%',
+  end = 'bottom 20%',
+  scrub = false,
+  markers = false,
+}: GSAPScrollTriggerProps) {
+  const elementRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!elementRef.current) return
+
+    const animations = {
+      fade: { opacity: 0, duration: 1 },
+      slideUp: { y: 100, opacity: 0, duration: 1 },
+      slideLeft: { x: 100, opacity: 0, duration: 1 },
+      scale: { scale: 0.8, opacity: 0, duration: 1 },
+      rotate: { rotation: 45, opacity: 0, duration: 1 },
+      custom: customAnimation || {},
+    }
+
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: trigger || elementRef.current,
+        start,
+        end,
+        scrub,
+        markers,
+      },
+    })
+
+    tl.from(elementRef.current, animations[animation])
+
+    return () => {
+      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
+    }
+  }, [animation, customAnimation, trigger, start, end, scrub, markers])
+
+  return <div ref={elementRef}>{children}</div>
+}
+```
+
+### Magnetic Hover Effect
+
+**File: `src/components/animations/MagneticHover.tsx`**
+
+```typescript
+'use client'
+
+import { useRef, useState } from 'react'
+import { motion } from 'framer-motion'
+
+interface MagneticHoverProps {
+  children: React.ReactNode
+  strength?: number
+  className?: string
+}
+
+export default function MagneticHover({ 
+  children, 
+  strength = 20,
+  className = '' 
+}: MagneticHoverProps) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [position, setPosition] = useState({ x: 0, y: 0 })
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return
+
+    const rect = ref.current.getBoundingClientRect()
+    const centerX = rect.left + rect.width / 2
+    const centerY = rect.top + rect.height / 2
+
+    const deltaX = (e.clientX - centerX) / rect.width
+    const deltaY = (e.clientY - centerY) / rect.height
+
+    setPosition({
+      x: deltaX * strength,
+      y: deltaY * strength,
+    })
+  }
+
+  const handleMouseLeave = () => {
+    setPosition({ x: 0, y: 0 })
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      className={className}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      animate={{ x: position.x, y: position.y }}
+      transition={{ type: 'spring', stiffness: 150, damping: 15 }}
+    >
+      {children}
+    </motion.div>
+  )
+}
+```
+
+### Floating Background Elements
+
+**File: `src/components/animations/FloatingElements.tsx`**
+
+```typescript
+'use client'
+
+import { motion } from 'framer-motion'
+
+interface FloatingElement {
+  id: string
+  icon: string
+  size: number
+  x: string
+  y: string
+  duration: number
+  delay: number
+}
+
+const floatingElements: FloatingElement[] = [
+  { id: '1', icon: '🎨', size: 60, x: '10%', y: '20%', duration: 4, delay: 0 },
+  { id: '2', icon: '💻', size: 80, x: '80%', y: '15%', duration: 5, delay: 0.5 },
+  { id: '3', icon: '🚀', size: 70, x: '15%', y: '70%', duration: 4.5, delay: 1 },
+  { id: '4', icon: '⚡', size: 50, x: '85%', y: '65%', duration: 3.5, delay: 1.5 },
+  { id: '5', icon: '✨', size: 55, x: '50%', y: '50%', duration: 6, delay: 2 },
+]
+
+export default function FloatingElements() {
+  return (
+    <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {floatingElements.map((element) => (
+        <motion.div
+          key={element.id}
+          className="absolute"
+          style={{
+            left: element.x,
+            top: element.y,
+            fontSize: `${element.size}px`,
+          }}
+          animate={{
+            y: [0, -30, 0],
+            rotate: [0, 10, -10, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: element.duration,
+            delay: element.delay,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
+        >
+          <motion.span
+            animate={{ opacity: [0.3, 0.6, 0.3] }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+          >
+            {element.icon}
+          </motion.span>
+        </motion.div>
+      ))}
+    </div>
+  )
+}
+```
+
+### Text Split Animation
+
+**File: `src/components/animations/TextSplitReveal.tsx`**
+
+```typescript
+'use client'
+
+import { motion } from 'framer-motion'
+
+interface TextSplitRevealProps {
+  text: string
+  className?: string
+  delay?: number
+  type?: 'words' | 'chars'
+}
+
+export default function TextSplitReveal({ 
+  text, 
+  className = '',
+  delay = 0,
+  type = 'words' 
+}: TextSplitRevealProps) {
+  const items = type === 'words' ? text.split(' ') : text.split('')
+
+  const container = {
+    hidden: { opacity: 0 },
+    visible: (i = 1) => ({
+      opacity: 1,
+      transition: { 
+        staggerChildren: type === 'words' ? 0.08 : 0.03, 
+        delayChildren: delay 
+      },
+    }),
+  }
+
+  const child = {
+    hidden: {
+      opacity: 0,
+      y: 20,
+      rotateX: -90,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      transition: {
+        type: 'spring',
+        damping: 12,
+        stiffness: 200,
+      },
+    },
+  }
+
+  return (
+    <motion.div
+      className={className}
+      variants={container}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true }}
+    >
+      {items.map((item, index) => (
+        <motion.span
+          key={index}
+          variants={child}
+          style={{ 
+            display: 'inline-block',
+            marginRight: type === 'words' ? '0.25em' : '0',
+          }}
+        >
+          {item}
+        </motion.span>
+      ))}
+    </motion.div>
+  )
+}
+```
+
+### Image Parallax Zoom
+
+**File: `src/components/animations/ImageParallaxZoom.tsx`**
+
+```typescript
+'use client'
+
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
+import Image from 'next/image'
+
+interface ImageParallaxZoomProps {
+  src: string
+  alt: string
+  width: number
+  height: number
+  zoomScale?: number
+}
+
+export default function ImageParallaxZoom({
+  src,
+  alt,
+  width,
+  height,
+  zoomScale = 1.2,
+}: ImageParallaxZoomProps) {
+  const ref = useRef(null)
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  })
+
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, zoomScale, 1])
+  const y = useTransform(scrollYProgress, [0, 1], [0, -50])
+  const opacity = useTransform(scrollYProgress, [0, 0.3, 0.7, 1], [0, 1, 1, 0])
+
+  return (
+    <div ref={ref} className="relative overflow-hidden rounded-xl">
+      <motion.div
+        style={{ scale, y }}
+        className="relative"
+      >
+        <motion.div style={{ opacity }}>
+          <Image
+            src={src}
+            alt={alt}
+            width={width}
+            height={height}
+            className="w-full h-auto"
+          />
+        </motion.div>
+      </motion.div>
+    </div>
+  )
+}
+```
+
+### 3D Card Hover Effect
+
+**File: `src/components/animations/Card3D.tsx`**
+
+```typescript
+'use client'
+
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
+import { ReactNode } from 'react'
+
+interface Card3DProps {
+  children: ReactNode
+  className?: string
+}
+
+export default function Card3D({ children, className = '' }: Card3DProps) {
+  const x = useMotionValue(0)
+  const y = useMotionValue(0)
+
+  const mouseXSpring = useSpring(x)
+  const mouseYSpring = useSpring(y)
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ['17.5deg', '-17.5deg'])
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ['-17.5deg', '17.5deg'])
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+
+    const width = rect.width
+    const height = rect.height
+
+    const mouseX = e.clientX - rect.left
+    const mouseY = e.clientY - rect.top
+
+    const xPct = mouseX / width - 0.5
+    const yPct = mouseY / height - 0.5
+
+    x.set(xPct)
+    y.set(yPct)
+  }
+
+  const handleMouseLeave = () => {
+    x.set(0)
+    y.set(0)
+  }
+
+  return (
+    <motion.div
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{
+        rotateX,
+        rotateY,
+        transformStyle: 'preserve-3d',
+      }}
+      className={`relative ${className}`}
+    >
+      <div style={{ transform: 'translateZ(75px)', transformStyle: 'preserve-3d' }}>
+        {children}
+      </div>
+    </motion.div>
+  )
+}
+```
+
+### Scroll Progress Indicator
+
+**File: `src/components/animations/ScrollProgress.tsx`**
+
+```typescript
+'use client'
+
+import { motion, useScroll, useSpring } from 'framer-motion'
+
+export default function ScrollProgress() {
+  const { scrollYProgress } = useScroll()
+  const scaleX = useSpring(scrollYProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  })
+
+  return (
+    <motion.div
+      className="fixed top-0 left-0 right-0 h-1 bg-primary-500 origin-left z-[100]"
+      style={{ scaleX }}
+    />
+  )
+}
+```
+
+### Stagger Reveal Grid
+
+**File: `src/components/animations/StaggerRevealGrid.tsx`**
+
+```typescript
+'use client'
+
+import { motion } from 'framer-motion'
+import { ReactNode } from 'react'
+
+interface StaggerRevealGridProps {
+  children: ReactNode[]
+  columns?: 2 | 3 | 4
+  gap?: number
+}
+
+export default function StaggerRevealGrid({
+  children,
+  columns = 3,
+  gap = 6,
+}: StaggerRevealGridProps) {
+  const container = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+  }
+
+  const item = {
+    hidden: { y: 40, opacity: 0, scale: 0.95 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      scale: 1,
+      transition: {
+        type: 'spring',
+        damping: 20,
+        stiffness: 100,
+      },
+    },
+  }
+
+  return (
+    <motion.div
+      className={`grid grid-cols-1 md:grid-cols-${columns} gap-${gap}`}
+      variants={container}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+    >
+      {children.map((child, index) => (
+        <motion.div key={index} variants={item}>
+          {child}
+        </motion.div>
+      ))}
+    </motion.div>
+  )
+}
+```
+
+### Curved Text Path Animation
+
+**File: `src/components/animations/CurvedText.tsx`**
+
+```typescript
+'use client'
+
+import { motion } from 'framer-motion'
+import { useEffect, useRef } from 'react'
+
+interface CurvedTextProps {
+  text: string
+  radius?: number
+  fontSize?: number
+  className?: string
+}
+
+export default function CurvedText({
+  text,
+  radius = 100,
+  fontSize = 16,
+  className = '',
+}: CurvedTextProps) {
+  const svgRef = useRef<SVGSVGElement>(null)
+  const pathId = `curve-${Math.random().toString(36).substr(2, 9)}`
+
+  const pathD = `M ${radius},${radius * 2} A ${radius},${radius} 0 0,1 ${radius * 3},${radius * 2}`
+
+  return (
+    <motion.svg
+      ref={svgRef}
+      viewBox={`0 0 ${radius * 4} ${radius * 4}`}
+      className={className}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1, rotate: 360 }}
+      transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+    >
+      <defs>
+        <path id={pathId} d={pathD} fill="transparent" />
+      </defs>
+      <text fontSize={fontSize} fill="currentColor">
+        <textPath href={`#${pathId}`} startOffset="0%">
+          {text}
+        </textPath>
+      </text>
+    </motion.svg>
+  )
+}
+```
+
+### Smooth Scroll Component (Enhanced)
 
 ```typescript
 'use client'
