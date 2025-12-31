@@ -1,8 +1,34 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   reactCompiler: true,
   reactStrictMode: true,
+
+  // Exclude server-only packages from client bundle
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        fs: false,
+        net: false,
+        tls: false,
+        crypto: false,
+        path: false,
+        os: false,
+        stream: false,
+        buffer: false,
+      };
+      
+      // Exclude server-only modules from client bundle
+      config.externals = [
+        ...config.externals || [],
+        'bcrypt',
+        'mysql2',
+      ];
+    }
+    return config;
+  },
 
   // Image Optimization (14.1)
   images: {

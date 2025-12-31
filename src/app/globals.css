@@ -151,16 +151,16 @@
   --color-surface-dark: #0A0E27;
   --color-gradient-start: #8A99FF;
   --color-gradient-end: #A37BD6;
-  --color-dark-50: #F8FAFC;
-  --color-dark-100: #E2E8F0;
-  --color-dark-200: #CBD5E1;
-  --color-dark-300: #94A3B8;
+  --color-dark-50: #0F172A;
+  --color-dark-100: #1E293B;
+  --color-dark-200: #334155;
+  --color-dark-300: #475569;
   --color-dark-400: #64748B;
-  --color-dark-500: #475569;
-  --color-dark-600: #334155;
-  --color-dark-700: #1E293B;
-  --color-dark-800: #121A2B;
-  --color-dark-900: #0A0E27;
+  --color-dark-500: #94A3B8;
+  --color-dark-600: #CBD5E1;
+  --color-dark-700: #E2E8F0;
+  --color-dark-800: #F1F5F9;
+  --color-dark-900: #F8FAFC;
   --color-warm-50: #FEF2F2;
   --color-warm-100: #FEE2E2;
   --color-warm-500: #F87171;
@@ -181,9 +181,6 @@
 @layer base {
   * {
     border-color: var(--color-dark-200);
-    &:where(.dark, .dark *) {
-      border-color: var(--color-dark-200-dark);
-    }
   }
 
   body {
@@ -193,10 +190,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     font-feature-settings: 'rlig' 1, 'calt' 1, 'ss01' 1;
-    &:where(.dark, .dark *) {
-      background-color: var(--color-secondary-dark);
-      color: var(--color-text-primary-dark);
-    }
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   html {
@@ -231,34 +225,21 @@
 
   ::-webkit-scrollbar-track {
     background: var(--color-dark-100);
-    &:where(.dark, .dark *) {
-      background: var(--color-dark-100-dark);
-    }
   }
 
   ::-webkit-scrollbar-thumb {
     background: var(--color-accent-cool);
     border-radius: 100px;
-    &:where(.dark, .dark *) {
-      background: var(--color-accent-cool-dark);
-    }
   }
 
   ::-webkit-scrollbar-thumb:hover {
     background: var(--color-cool-600);
-    &:where(.dark, .dark *) {
-      background: var(--color-cool-600-dark);
-    }
   }
 
   /* Selection */
   ::selection {
     background: color-mix(in srgb, var(--color-accent-cool) 20%, transparent);
     color: var(--color-text-primary);
-    &:where(.dark, .dark *) {
-      background: color-mix(in srgb, var(--color-accent-cool-dark) 20%, transparent);
-      color: var(--color-text-primary-dark);
-    }
   }
 
   /* Headings */
@@ -269,23 +250,14 @@
 
   .text-text-primary {
     color: var(--color-text-primary);
-    &:where(.dark, .dark *) {
-      color: var(--color-text-primary-dark);
-    }
   }
 
   .text-text-secondary {
     color: var(--color-text-secondary);
-    &:where(.dark, .dark *) {
-      color: var(--color-text-secondary-dark);
-    }
   }
 
   .bg-secondary {
     background-color: var(--color-secondary);
-    &:where(.dark, .dark *) {
-      background-color: var(--color-secondary-dark);
-    }
   }
 }
 
@@ -294,20 +266,14 @@
   background: color-mix(in srgb, var(--color-surface-light) 70%, transparent);
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid color-mix(in srgb, var(--color-surface-light) 30%, transparent);
-  &:where(.dark, .dark *) {
-    background: color-mix(in srgb, var(--color-surface-light-dark) 60%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-text-primary-dark) 10%, transparent);
-  }
+  transition: all 0.3s ease;
 }
 
 @utility glass-dark {
   background: color-mix(in srgb, var(--color-surface-dark) 60%, transparent);
   backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid color-mix(in srgb, var(--color-text-primary) 10%, transparent);
-  &:where(.dark, .dark *) {
-    background: color-mix(in srgb, var(--color-surface-dark-dark) 60%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-text-primary-dark) 10%, transparent);
-  }
+  transition: all 0.3s ease;
 }
 
 @utility gradient-text-warm {
@@ -315,9 +281,6 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  &:where(.dark, .dark *) {
-    background: linear-gradient(135deg, var(--color-warm-500-dark), var(--color-gold-500-dark));
-  }
 }
 
 @utility gradient-text-cool {
@@ -325,9 +288,6 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  &:where(.dark, .dark *) {
-    background: linear-gradient(135deg, var(--color-cool-500-dark), var(--color-gradient-start-dark));
-  }
 }
 
 @utility gradient-text-primary {
@@ -335,9 +295,6 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  &:where(.dark, .dark *) {
-    background: linear-gradient(135deg, var(--color-gradient-start-dark), var(--color-gradient-end-dark));
-  }
 }
 
 @utility card-modern {
@@ -347,11 +304,6 @@
   border: 1px solid var(--color-dark-200);
   box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
   transition: all 0.3s;
-  &:where(.dark, .dark *) {
-    background-color: var(--color-surface-light-dark);
-    border: 1px solid var(--color-dark-200-dark);
-    box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.3);
-  }
 }
 
 @utility card-elevated {
@@ -360,10 +312,6 @@
   padding: 2rem;
   box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   transition: all 0.3s;
-  &:where(.dark, .dark *) {
-    background-color: var(--color-surface-light-dark);
-    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3), 0 8px 10px -6px rgb(0 0 0 / 0.3);
-  }
 }
 
 @utility card-glass {
@@ -374,32 +322,18 @@
   padding: 2rem;
   box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
   transition: all 0.3s;
-  &:where(.dark, .dark *) {
-    background: color-mix(in srgb, var(--color-surface-light-dark) 60%, transparent);
-    border: 1px solid color-mix(in srgb, var(--color-text-primary-dark) 10%, transparent);
-    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.3);
-  }
 }
 
 @utility bg-gradient-warm {
   background: linear-gradient(135deg, var(--color-warm-500), var(--color-gold-500));
-  &:where(.dark, .dark *) {
-    background: linear-gradient(135deg, var(--color-warm-500-dark), var(--color-gold-500-dark));
-  }
 }
 
 @utility bg-gradient-cool {
   background: linear-gradient(135deg, var(--color-cool-500), var(--color-gradient-start));
-  &:where(.dark, .dark *) {
-    background: linear-gradient(135deg, var(--color-cool-500-dark), var(--color-gradient-start-dark));
-  }
 }
 
 @utility bg-gradient-primary {
   background: linear-gradient(135deg, var(--color-gradient-start), var(--color-gradient-end));
-  &:where(.dark, .dark *) {
-    background: linear-gradient(135deg, var(--color-gradient-start-dark), var(--color-gradient-end-dark));
-  }
 }
 
 @utility bg-mesh-gradient {
@@ -410,15 +344,6 @@
     radial-gradient(at 80% 50%, color-mix(in srgb, var(--color-accent-gold) 10%, transparent) 0px, transparent 50%),
     radial-gradient(at 0% 100%, color-mix(in srgb, var(--color-gradient-end) 15%, transparent) 0px, transparent 50%),
     radial-gradient(at 80% 100%, color-mix(in srgb, var(--color-accent-cool) 10%, transparent) 0px, transparent 50%);
-  &:where(.dark, .dark *) {
-    background:
-      radial-gradient(at 40% 20%, color-mix(in srgb, var(--color-gradient-start-dark) 15%, transparent) 0px, transparent 50%),
-      radial-gradient(at 80% 0%, color-mix(in srgb, var(--color-accent-cool-dark) 15%, transparent) 0px, transparent 50%),
-      radial-gradient(at 0% 50%, color-mix(in srgb, var(--color-accent-warm-dark) 10%, transparent) 0px, transparent 50%),
-      radial-gradient(at 80% 50%, color-mix(in srgb, var(--color-accent-gold-dark) 10%, transparent) 0px, transparent 50%),
-      radial-gradient(at 0% 100%, color-mix(in srgb, var(--color-gradient-end-dark) 15%, transparent) 0px, transparent 50%),
-      radial-gradient(at 80% 100%, color-mix(in srgb, var(--color-accent-cool-dark) 10%, transparent) 0px, transparent 50%);
-  }
 }
 
 @utility text-shadow-sm {
@@ -473,19 +398,11 @@
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  &:where(.dark, .dark *) {
-    background-color: var(--color-surface-light-dark);
-    border: 1px solid var(--color-dark-200-dark);
-    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.2), 0 2px 4px -2px rgb(0 0 0 / 0.2);
-  }
 }
 
 @utility bento-card-hover {
   transform: translateY(-8px);
   box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  &:where(.dark, .dark *) {
-    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.4);
-  }
 }
 
 /* Fluid Typography Utilities */

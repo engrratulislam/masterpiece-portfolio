@@ -68,7 +68,7 @@ export default function About() {
   ]
 
   return (
-    <section id="about" className="relative py-24 lg:py-32 bg-white overflow-hidden">
+    <section id="about" className="relative py-24 lg:py-32 bg-secondary overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute top-0 right-0 w-1/3 h-1/3 bg-gradient-cool rounded-full blur-3xl opacity-10" />
       <div className="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-warm rounded-full blur-3xl opacity-10" />
@@ -102,7 +102,7 @@ export default function About() {
                 <div className="absolute -inset-6 bg-gradient-primary rounded-3xl blur-2xl opacity-20" />
                 
                 {/* Image Container */}
-                <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+                <div className="relative aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border-4 glass-modern">
                   <Image
                     src="/images/about/profile.jpeg"
                     alt="Engr. Ratul - Full Stack Developer"
@@ -244,7 +244,7 @@ export default function About() {
                     </div>
                     
                     {/* Progress Bar */}
-                    <div className="w-full h-2 bg-dark-100 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-text-secondary/20 rounded-full overflow-hidden">
                       <motion.div
                         className="h-full bg-gradient-cool rounded-full"
                         initial={{ width: 0 }}

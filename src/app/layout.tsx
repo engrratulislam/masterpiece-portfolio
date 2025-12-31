@@ -9,6 +9,7 @@ import ScrollProgress from '@/components/animations/ScrollProgress'
 import StructuredData from '@/components/common/StructuredData'
 import { WebVitals } from './web-vitals'
 import { ThemeProvider } from '@/contexts/ThemeContext'
+import { MainContent } from '@/components/layout/MainContent'
 
 // Optimized Font Loading (14.3)
 const inter = Inter({
@@ -79,23 +80,43 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${firaCode.variable}`}>
+    <html 
+      lang="en" 
+      className={`${inter.variable} ${firaCode.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                  var html = document.documentElement;
+                  html.classList.add(theme);
+                  html.style.colorScheme = theme;
+                } catch (e) {
+                  // Fallback to light theme if there's an error
+                  document.documentElement.classList.add('light');
+                  document.documentElement.style.colorScheme = 'light';
+                }
+              })();
+            `,
+          }}
+        />
         <StructuredData />
       </head>
-      <body className="bg-secondary text-text-primary font-sans antialiased">
+      <body className="bg-secondary text-text-primary font-sans antialiased" suppressHydrationWarning>
         <ThemeProvider>
           <WebVitals />
           <ScrollProgress />
           <SmoothScroll>
             <Sidebar />
             <MobileMenuButton />
-            <main className="min-h-screen lg:pl-64">
-              {children}
-            </main>
+            <MainContent>{children}</MainContent>
             <Footer />
           </SmoothScroll>
         </ThemeProvider>

@@ -66,7 +66,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
 
           {/* Menu Panel */}
           <motion.div
-            className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-dark-800 z-50 p-8"
+            className="fixed top-0 right-0 bottom-0 w-full max-w-sm bg-surface-light z-50 p-8"
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
@@ -85,8 +85,8 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
                     onClick={(e) => handleClick(e, item.href)}
                     className={`text-2xl font-medium transition-colors ${
                       pathname === item.href
-                        ? 'text-primary-500'
-                        : 'text-white hover:text-primary-400'
+                        ? 'text-accent-cool'
+                        : 'text-text-primary hover:text-accent-cool'
                     }`}
                   >
                     {item.name}
@@ -97,7 +97,7 @@ export default function MobileMenu({ isOpen, onClose }: MobileMenuProps) {
               <motion.a
                 href="#contact"
                 onClick={(e) => handleClick(e, '#contact')}
-                className="mt-8 px-8 py-4 bg-primary-500 rounded-lg text-center font-medium hover:bg-primary-600 transition-colors"
+                className="mt-8 px-8 py-4 bg-gradient-primary rounded-lg text-center font-medium text-white transition-colors"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5 }}

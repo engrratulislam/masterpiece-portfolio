@@ -52,7 +52,7 @@ export default function Testimonials() {
   }
 
   return (
-    <section id="testimonials" className="relative py-20 md:py-32 bg-dark-900 overflow-hidden">
+    <section id="testimonials" className="relative py-20 md:py-32 bg-secondary overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
         <Parallax speed={-0.33} className="absolute inset-0">
           <div className="absolute top-1/4 -right-48 w-96 h-96 bg-yellow-500/10 rounded-full blur-3xl" />
@@ -71,17 +71,17 @@ export default function Testimonials() {
           transition={{ duration: 0.6 }}
         >
           <motion.span
-            className="inline-block px-4 py-2 bg-primary-500/10 border border-primary-500/30 rounded-full text-primary-400 text-sm font-medium mb-4"
+            className="inline-block px-4 py-2 glass-modern rounded-full text-sm font-semibold text-text-primary mb-4"
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
             Client Feedback
           </motion.span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display mb-4">
-            What Clients <span className="bg-gradient-to-r from-primary-500 to-purple-500 bg-clip-text text-transparent">Say</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display mb-4 text-text-primary">
+            What Clients <span className="gradient-text-primary">Say</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
             Don't just take my word for it - hear from some of the clients I've worked with
           </p>
         </motion.div>
@@ -103,10 +103,10 @@ export default function Testimonials() {
                 }}
                 className="absolute inset-0"
               >
-                <div className="bg-dark-800 border border-white/10 rounded-2xl p-8 md:p-12 relative">
+                <div className="card-elevated relative">
                   {/* Quote Icon */}
                   <div className="absolute top-8 right-8 opacity-10">
-                    <Quote className="w-24 h-24 text-primary-500" />
+                    <Quote className="w-24 h-24 text-accent-cool" />
                   </div>
 
                   {/* Content */}
@@ -114,7 +114,7 @@ export default function Testimonials() {
                     {/* Client Info */}
                     <div className="flex items-center gap-6 mb-6">
                       {/* Client Image */}
-                      <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-primary-500/30 flex-shrink-0">
+                      <div className="relative w-20 h-20 rounded-full overflow-hidden border-4 border-accent-cool/30 flex-shrink-0">
                         <Image
                           src={currentTestimonial.image}
                           alt={currentTestimonial.name}
@@ -126,12 +126,12 @@ export default function Testimonials() {
 
                       {/* Client Details */}
                       <div className="flex-1">
-                        <h3 className="text-2xl font-bold mb-1">{currentTestimonial.name}</h3>
-                        <p className="text-gray-400">
+                        <h3 className="text-2xl font-bold mb-1 text-text-primary">{currentTestimonial.name}</h3>
+                        <p className="text-text-secondary">
                           {currentTestimonial.position} at {currentTestimonial.company}
                         </p>
                         {currentTestimonial.projectType && (
-                          <p className="text-sm text-primary-400 mt-1">
+                          <p className="text-sm text-accent-cool mt-1">
                             Project: {currentTestimonial.projectType}
                           </p>
                         )}
@@ -144,8 +144,8 @@ export default function Testimonials() {
                             key={i}
                             className={`w-6 h-6 ${
                               i < currentTestimonial.rating
-                                ? 'fill-yellow-400 text-yellow-400'
-                                : 'text-gray-600'
+                                ? 'fill-accent-gold text-accent-gold'
+                                : 'text-text-secondary/40'
                             }`}
                           />
                         ))}
@@ -159,20 +159,20 @@ export default function Testimonials() {
                           key={i}
                           className={`w-5 h-5 ${
                             i < currentTestimonial.rating
-                              ? 'fill-yellow-400 text-yellow-400'
-                              : 'text-gray-600'
+                              ? 'fill-accent-gold text-accent-gold'
+                              : 'text-text-secondary/40'
                           }`}
                         />
                       ))}
                     </div>
 
                     {/* Testimonial Text */}
-                    <p className="text-gray-300 text-lg leading-relaxed mb-6">
+                    <p className="text-text-primary text-lg leading-relaxed mb-6">
                       "{currentTestimonial.text}"
                     </p>
 
                     {/* Date */}
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-text-secondary">
                       {new Date(currentTestimonial.date).toLocaleDateString('en-US', {
                         month: 'long',
                         year: 'numeric',
@@ -186,18 +186,18 @@ export default function Testimonials() {
             {/* Navigation Buttons */}
             <button
               onClick={handlePrev}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-16 w-12 h-12 bg-dark-800 border border-white/10 rounded-full flex items-center justify-center hover:bg-primary-500 hover:border-primary-500 transition-all group"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-16 w-12 h-12 glass-modern rounded-full flex items-center justify-center hover:bg-accent-cool/20 hover:border-accent-cool transition-all group"
               aria-label="Previous testimonial"
             >
-              <ChevronLeft className="w-6 h-6 text-gray-400 group-hover:text-white" />
+              <ChevronLeft className="w-6 h-6 text-text-secondary group-hover:text-text-primary" />
             </button>
 
             <button
               onClick={handleNext}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-16 w-12 h-12 bg-dark-800 border border-white/10 rounded-full flex items-center justify-center hover:bg-primary-500 hover:border-primary-500 transition-all group"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-16 w-12 h-12 glass-modern rounded-full flex items-center justify-center hover:bg-accent-cool/20 hover:border-accent-cool transition-all group"
               aria-label="Next testimonial"
             >
-              <ChevronRight className="w-6 h-6 text-gray-400 group-hover:text-white" />
+              <ChevronRight className="w-6 h-6 text-text-secondary group-hover:text-text-primary" />
             </button>
           </div>
 
@@ -209,8 +209,8 @@ export default function Testimonials() {
                 onClick={() => handleDotClick(index)}
                 className={`w-3 h-3 rounded-full transition-all duration-300 ${
                   index === currentIndex
-                    ? 'bg-primary-500 w-8'
-                    : 'bg-gray-600 hover:bg-gray-500'
+                    ? 'bg-accent-cool w-8'
+                    : 'bg-text-secondary/30 hover:bg-text-secondary/50'
                 }`}
                 aria-label={`Go to testimonial ${index + 1}`}
               />
@@ -228,38 +228,38 @@ export default function Testimonials() {
         >
           {/* Average Rating */}
           <motion.div
-            className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/30 rounded-xl p-6 text-center"
+            className="card-glass text-center"
             whileHover={{ scale: 1.05, y: -5 }}
           >
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Star className="w-8 h-8 fill-yellow-400 text-yellow-400" />
-              <div className="text-5xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+              <Star className="w-8 h-8 fill-accent-gold text-accent-gold" />
+              <div className="text-5xl font-bold gradient-text-warm">
                 {getAverageRating()}
               </div>
             </div>
-            <div className="text-gray-400">Average Rating</div>
+            <div className="text-text-secondary">Average Rating</div>
           </motion.div>
 
           {/* Total Testimonials */}
           <motion.div
-            className="bg-gradient-to-br from-primary-500/10 to-purple-500/10 border border-primary-500/30 rounded-xl p-6 text-center"
+            className="card-glass text-center"
             whileHover={{ scale: 1.05, y: -5 }}
           >
-            <div className="text-5xl font-bold bg-gradient-to-r from-primary-500 to-purple-500 bg-clip-text text-transparent mb-2">
+            <div className="text-5xl font-bold gradient-text-primary mb-2">
               {getTotalTestimonials()}
             </div>
-            <div className="text-gray-400">Happy Clients</div>
+            <div className="text-text-secondary">Happy Clients</div>
           </motion.div>
 
           {/* Satisfaction Rate */}
           <motion.div
-            className="bg-gradient-to-br from-green-500/10 to-teal-500/10 border border-green-500/30 rounded-xl p-6 text-center"
+            className="card-glass text-center"
             whileHover={{ scale: 1.05, y: -5 }}
           >
-            <div className="text-5xl font-bold bg-gradient-to-r from-green-500 to-teal-500 bg-clip-text text-transparent mb-2">
+            <div className="text-5xl font-bold gradient-text-cool mb-2">
               100%
             </div>
-            <div className="text-gray-400">Satisfaction Rate</div>
+            <div className="text-text-secondary">Satisfaction Rate</div>
           </motion.div>
         </motion.div>
       </div>

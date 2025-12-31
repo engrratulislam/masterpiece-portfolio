@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Github, Linkedin, Mail } from 'lucide-react'
 import { useState, useEffect } from 'react'
-import { ThemeToggle } from '@/components/common/ThemeToggle'
+import Image from 'next/image'
 
 const navItems = [
   { name: 'Home', href: '#hero' },
@@ -26,6 +26,11 @@ const socialLinks = [
 export default function Sidebar() {
   const pathname = usePathname()
   const [activeSection, setActiveSection] = useState('hero')
+
+  // Don't render on admin login page
+  if (pathname === '/admin/login') {
+    return null
+  }
 
   useEffect(() => {
     const handleScroll = () => {
@@ -62,21 +67,51 @@ export default function Sidebar() {
 
   return (
     <motion.aside
-      className="fixed left-0 top-0 h-screen w-64 bg-dark-800/95 backdrop-blur-md border-r border-white/10 z-50 hidden lg:flex flex-col justify-between py-12 px-6"
+      className="fixed left-0 top-0 h-screen w-64 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-md border-r border-dark-200 dark:border-dark-600 z-50 hidden lg:flex flex-col justify-between py-12 px-6 transition-colors duration-300"
       initial={{ x: -100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
     >
-      {/* Logo */}
-      <div>
-        <Link href="/" className="block text-center">
-          <motion.h1
-            className="text-2xl font-bold font-display bg-gradient-to-r from-primary-500 to-purple-500 bg-clip-text text-transparent"
+      {/* Profile Section */}
+      <div className="text-center space-y-4">
+        <Link href="/" className="block">
+          {/* Profile Picture */}
+          <motion.div
+            className="relative w-20 h-20 mx-auto mb-4"
             whileHover={{ scale: 1.05 }}
             transition={{ type: 'spring', stiffness: 400 }}
           >
-            Engr. Ratul
-          </motion.h1>
+            <div className="w-full h-full rounded-full bg-gradient-to-br from-accent-cool to-accent-warm p-0.5">
+              <div className="w-full h-full rounded-full overflow-hidden bg-surface-light dark:bg-surface-dark">
+                <Image
+                  src="/images/about/profile.jpeg"
+                  alt="Engr. Ratul - Software Developer"
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                  priority
+                />
+              </div>
+            </div>
+            {/* Online Status Indicator */}
+            <div className="absolute bottom-1 right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-surface-light dark:border-surface-dark">
+              <div className="w-full h-full bg-green-500 rounded-full animate-pulse" />
+            </div>
+          </motion.div>
+          
+          {/* Professional Title */}
+          <motion.div
+            className="space-y-1"
+            whileHover={{ scale: 1.02 }}
+            transition={{ type: 'spring', stiffness: 400 }}
+          >
+            <h1 className="text-xl font-bold font-display gradient-text-primary">
+              Engr. Ratul
+            </h1>
+            <p className="text-sm font-medium text-text-secondary">
+              Software Developer
+            </p>
+          </motion.div>
         </Link>
       </div>
 
@@ -98,13 +133,13 @@ export default function Sidebar() {
                 onClick={(e) => handleClick(e, item.href)}
                 className={`block py-3 px-4 text-base font-medium transition-all relative group rounded-lg ${
                   isActive
-                    ? 'text-white bg-primary-500/10'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    ? 'text-text-primary bg-accent-cool/10'
+                    : 'text-text-secondary hover:text-text-primary hover:bg-text-secondary/10'
                 }`}
               >
                 <span className="relative z-10">{item.name}</span>
                 <motion.div
-                  className="absolute left-0 top-0 bottom-0 w-1 bg-primary-500 rounded-r"
+                  className="absolute left-0 top-0 bottom-0 w-1 bg-accent-cool rounded-r"
                   initial={false}
                   animate={{
                     opacity: isActive ? 1 : 0,
@@ -118,23 +153,20 @@ export default function Sidebar() {
         })}
       </nav>
 
-      {/* Theme Toggle and Social Links */}
+      {/* Social Links */}
       <motion.div
-        className="pt-6 border-t border-white/10 space-y-3"
+        className="pt-6 border-t border-dark-200 space-y-3"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
       >
-        <div className="flex justify-center">
-          <ThemeToggle />
-        </div>
         {socialLinks.map(({ Icon, href, label }) => (
           <motion.a
             key={label}
             href={href}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-3 p-2 rounded-lg text-gray-400 hover:text-primary-400 hover:bg-white/5 transition-all group"
+            className="flex items-center gap-3 p-2 rounded-lg text-text-secondary hover:text-accent-cool hover:bg-text-secondary/10 transition-all group"
             whileHover={{ x: 3 }}
             aria-label={label}
           >

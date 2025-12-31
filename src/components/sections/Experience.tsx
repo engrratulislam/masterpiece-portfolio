@@ -16,7 +16,7 @@ export default function Experience() {
   }
 
   return (
-    <section id="experience" className="relative py-24 lg:py-32 bg-white overflow-hidden">
+    <section id="experience" className="relative py-24 lg:py-32 bg-secondary overflow-hidden">
       {/* Background Elements */}
       <div className="absolute top-0 left-0 w-1/2 h-1/2 bg-gradient-cool rounded-full blur-3xl opacity-10" />
       <div className="absolute bottom-0 right-0 w-1/2 h-1/2 bg-gradient-warm rounded-full blur-3xl opacity-10" />
@@ -119,7 +119,7 @@ export default function Experience() {
                               <span>
                                 {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
                               </span>
-                              <span className="text-xs px-2 py-0.5 bg-dark-100 rounded-full ml-1">
+                              <span className="text-xs px-2 py-0.5 bg-text-secondary/10 text-text-primary rounded-full ml-1">
                                 {calculateDuration(exp.startDate, exp.endDate)}
                               </span>
                             </div>

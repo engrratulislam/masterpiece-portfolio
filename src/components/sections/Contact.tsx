@@ -147,7 +147,7 @@ export default function Contact() {
   ]
 
   return (
-    <section id="contact" className="relative py-20 md:py-32 bg-dark-800 overflow-hidden">
+    <section id="contact" className="relative py-20 md:py-32 bg-secondary overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
         <Parallax speed={-0.36} className="absolute inset-0">
           <div className="absolute top-1/3 -left-48 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl" />
@@ -166,17 +166,17 @@ export default function Contact() {
           transition={{ duration: 0.6 }}
         >
           <motion.span
-            className="inline-block px-4 py-2 bg-primary-500/10 border border-primary-500/30 rounded-full text-primary-400 text-sm font-medium mb-4"
+            className="inline-block px-4 py-2 glass-modern rounded-full text-sm font-semibold text-text-primary mb-4"
             initial={{ opacity: 0, scale: 0.8 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
             Get In Touch
           </motion.span>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display mb-4">
-            Let's Work <span className="bg-gradient-to-r from-primary-500 to-purple-500 bg-clip-text text-transparent">Together</span>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display mb-4 text-text-primary">
+            Let's Work <span className="gradient-text-primary">Together</span>
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-text-secondary text-lg max-w-2xl mx-auto">
             Have a project in mind? Let's discuss how I can help bring your ideas to life
           </p>
         </motion.div>
@@ -191,8 +191,8 @@ export default function Contact() {
                 viewport={{ once: true }}
               >
               <motion.div variants={itemVariants} className="mb-8">
-                <h3 className="text-2xl font-bold mb-4">Contact Information</h3>
-                <p className="text-gray-400">
+                <h3 className="text-2xl font-bold mb-4 text-text-primary">Contact Information</h3>
+                <p className="text-text-secondary">
                   Feel free to reach out through any of these channels. I'm always open to discussing new projects and opportunities.
                 </p>
               </motion.div>
@@ -206,15 +206,15 @@ export default function Contact() {
                     target={info.label === 'Location' ? '_blank' : undefined}
                     rel={info.label === 'Location' ? 'noopener noreferrer' : undefined}
                     variants={itemVariants}
-                    className="flex items-center gap-4 p-4 bg-dark-900 border border-white/10 rounded-xl hover:border-primary-500/50 transition-all group"
+                    className="flex items-center gap-4 p-4 card-modern hover:border-accent-cool/50 transition-all group"
                     whileHover={{ x: 10 }}
                   >
                     <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${info.color} flex items-center justify-center flex-shrink-0`}>
                       <info.icon className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <div className="text-sm text-gray-400">{info.label}</div>
-                      <div className="text-white font-medium group-hover:text-primary-400 transition-colors">
+                      <div className="text-sm text-text-secondary">{info.label}</div>
+                      <div className="text-text-primary font-medium group-hover:text-accent-cool transition-colors">
                         {info.value}
                       </div>
                     </div>
@@ -224,7 +224,7 @@ export default function Contact() {
 
               {/* Social Links */}
               <motion.div variants={itemVariants}>
-                <h4 className="text-lg font-semibold mb-4">Follow Me</h4>
+                <h4 className="text-lg font-semibold mb-4 text-text-primary">Follow Me</h4>
                 <div className="flex gap-4">
                   {socialLinks.map((social, index) => (
                     <motion.a
@@ -233,7 +233,7 @@ export default function Contact() {
                       target="_blank"
                       rel="noopener noreferrer"
                       aria-label={social.label}
-                      className={`w-12 h-12 bg-dark-900 border border-white/10 rounded-lg flex items-center justify-center text-gray-400 ${social.color} transition-all`}
+                      className={`w-12 h-12 glass-modern rounded-lg flex items-center justify-center text-text-secondary ${social.color} transition-all`}
                       whileHover={{ y: -5, scale: 1.1 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -254,7 +254,7 @@ export default function Contact() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Name Field */}
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium mb-2">
+                  <label htmlFor="name" className="block text-sm font-medium mb-2 text-text-primary">
                     Your Name *
                   </label>
                   <input
@@ -263,9 +263,9 @@ export default function Contact() {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 bg-dark-900 border ${
-                      errors.name ? 'border-red-500' : 'border-white/10'
-                    } rounded-lg focus:outline-none focus:border-primary-500 transition-colors`}
+                    className={`w-full px-4 py-3 bg-surface-light border ${
+                      errors.name ? 'border-red-500' : 'border-dark-200'
+                    } rounded-lg focus:outline-none focus:border-accent-cool transition-colors text-text-primary`}
                     placeholder="John Doe"
                   />
                   {errors.name && (
@@ -278,7 +278,7 @@ export default function Contact() {
 
                 {/* Email Field */}
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium mb-2 text-text-primary">
                     Your Email *
                   </label>
                   <input
@@ -287,9 +287,9 @@ export default function Contact() {
                     name="email"
                     value={formData.email}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 bg-dark-900 border ${
-                      errors.email ? 'border-red-500' : 'border-white/10'
-                    } rounded-lg focus:outline-none focus:border-primary-500 transition-colors`}
+                    className={`w-full px-4 py-3 bg-surface-light border ${
+                      errors.email ? 'border-red-500' : 'border-dark-200'
+                    } rounded-lg focus:outline-none focus:border-accent-cool transition-colors text-text-primary`}
                     placeholder="john@example.com"
                   />
                   {errors.email && (
@@ -302,7 +302,7 @@ export default function Contact() {
 
                 {/* Subject Field */}
                 <div>
-                  <label htmlFor="subject" className="block text-sm font-medium mb-2">
+                  <label htmlFor="subject" className="block text-sm font-medium mb-2 text-text-primary">
                     Subject *
                   </label>
                   <input
@@ -311,9 +311,9 @@ export default function Contact() {
                     name="subject"
                     value={formData.subject}
                     onChange={handleChange}
-                    className={`w-full px-4 py-3 bg-dark-900 border ${
-                      errors.subject ? 'border-red-500' : 'border-white/10'
-                    } rounded-lg focus:outline-none focus:border-primary-500 transition-colors`}
+                    className={`w-full px-4 py-3 bg-surface-light border ${
+                      errors.subject ? 'border-red-500' : 'border-dark-200'
+                    } rounded-lg focus:outline-none focus:border-accent-cool transition-colors text-text-primary`}
                     placeholder="Project Inquiry"
                   />
                   {errors.subject && (
@@ -326,7 +326,7 @@ export default function Contact() {
 
                 {/* Message Field */}
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium mb-2">
+                  <label htmlFor="message" className="block text-sm font-medium mb-2 text-text-primary">
                     Message *
                   </label>
                   <textarea
@@ -335,9 +335,9 @@ export default function Contact() {
                     value={formData.message}
                     onChange={handleChange}
                     rows={6}
-                    className={`w-full px-4 py-3 bg-dark-900 border ${
-                      errors.message ? 'border-red-500' : 'border-white/10'
-                    } rounded-lg focus:outline-none focus:border-primary-500 transition-colors resize-none`}
+                    className={`w-full px-4 py-3 bg-surface-light border ${
+                      errors.message ? 'border-red-500' : 'border-dark-200'
+                    } rounded-lg focus:outline-none focus:border-accent-cool transition-colors resize-none text-text-primary`}
                     placeholder="Tell me about your project..."
                   />
                   {errors.message && (
@@ -352,7 +352,7 @@ export default function Contact() {
                 <motion.button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full px-8 py-4 bg-gradient-to-r from-primary-500 to-purple-500 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-primary-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="w-full px-8 py-4 bg-gradient-primary text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-accent-cool/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
                   whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
                 >

@@ -1,0 +1,20 @@
+/* Hide sidebar and footer on admin login page */
+.admin-login-page ~ aside,
+.admin-login-page ~ button[aria-label="Toggle sidebar"],
+body:has(.admin-login-page) aside,
+body:has(.admin-login-page) footer,
+body:has(.admin-login-page) > div > div > aside,
+body:has(.admin-login-page) > div > div > button {
+  display: none !important;
+}
+
+/* Remove left padding from main on login page */
+body:has(.admin-login-page) main {
+  padding-left: 0 !important;
+}
+
+/* Make login page full width */
+.admin-login-page {
+  width: 100vw;
+  min-height: 100vh;
+}

@@ -6,6 +6,8 @@ import { motion, useMotionValue, useSpring } from 'framer-motion'
 export default function MagneticCursor() {
   const [isVisible, setIsVisible] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+  const [isDesktop, setIsDesktop] = useState(false)
   
   const cursorX = useMotionValue(-100)
   const cursorY = useMotionValue(-100)
@@ -15,6 +17,20 @@ export default function MagneticCursor() {
   const cursorYSpring = useSpring(cursorY, springConfig)
 
   useEffect(() => {
+    setIsMounted(true)
+    setIsDesktop(window.innerWidth >= 1024)
+
+    const handleResize = () => {
+      setIsDesktop(window.innerWidth >= 1024)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
+    if (!isMounted || !isDesktop) return
+
     const moveCursor = (e: MouseEvent) => {
       cursorX.set(e.clientX - 16)
       cursorY.set(e.clientY - 16)
@@ -40,10 +56,10 @@ export default function MagneticCursor() {
         el.removeEventListener('mouseleave', handleMouseLeave)
       })
     }
-  }, [cursorX, cursorY])
+  }, [cursorX, cursorY, isMounted, isDesktop])
 
-  // Hide on mobile/tablet
-  if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+  // Don't render anything until mounted or on mobile/tablet
+  if (!isMounted || !isDesktop) {
     return null
   }
 

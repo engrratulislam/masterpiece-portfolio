@@ -90,7 +90,7 @@ export default function Skills() {
                     </div>
 
                     {/* Circular Progress */}
-                    <div className="relative w-full h-2 bg-dark-100 rounded-full overflow-hidden">
+                    <div className="relative w-full h-2 bg-text-secondary/20 rounded-full overflow-hidden">
                       <motion.div
                         className={`h-full bg-gradient-to-r ${skill.color} rounded-full`}
                         initial={{ width: 0 }}

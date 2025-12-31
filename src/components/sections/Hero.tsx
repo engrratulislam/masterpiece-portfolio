@@ -5,6 +5,7 @@ import { ArrowRight, Download, Sparkles, Code2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import MagneticHover from '@/components/animations/MagneticHover'
 import ScrollReveal from '@/components/animations/ScrollReveal'
+import { ThemeToggle } from '@/components/common/ThemeToggle'
 
 const Scene3D = dynamic(() => import('@/components/three/Scene'), {
   ssr: false,
@@ -37,6 +38,11 @@ export default function Hero() {
 
   return (
     <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-secondary">
+      {/* Static Theme Toggle - Top Right */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
+        <ThemeToggle />
+      </div>
+
       {/* Mesh Gradient Background */}
       <div className="absolute inset-0 bg-mesh-gradient" />
       
@@ -115,7 +121,7 @@ export default function Hero() {
                 <a
                   href="/images/about/Ratul-Islam-curriculum-vitae.pdf"
                   download="Ratul-Islam-Resume.pdf"
-                  className="group inline-flex items-center justify-center gap-3 px-8 py-4 glass-modern border-2 border-dark-300 font-semibold rounded-xl hover:border-accent-cool transition-all duration-300"
+                  className="group inline-flex items-center justify-center gap-3 px-8 py-4 glass-modern border-2 text-text-primary font-semibold rounded-xl hover:border-accent-cool transition-all duration-300"
                 >
                   <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
                   Download CV
@@ -203,7 +209,7 @@ export default function Hero() {
                   ].map((tech) => (
                     <motion.span
                       key={tech.name}
-                      className="px-3 py-1.5 bg-white/50 border border-dark-200 rounded-lg text-xs font-medium text-text-primary transition-all duration-300 cursor-default"
+                      className="px-3 py-1.5 glass-modern border-2 rounded-lg text-xs font-medium text-text-primary transition-all duration-300 cursor-default"
                       whileHover={{
                         backgroundColor: `${tech.color}20`,
                         borderColor: tech.color,

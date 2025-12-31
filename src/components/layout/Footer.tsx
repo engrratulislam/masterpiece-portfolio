@@ -1,9 +1,11 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { Github, Linkedin, Mail, Heart } from 'lucide-react'
 import { contactInfo } from '@/data/contact-info'
+import { usePathname } from 'next/navigation'
 
 const socialLinks = [
   { name: 'GitHub', icon: Github, href: contactInfo.social.github },
@@ -19,10 +21,20 @@ const footerLinks = [
 ]
 
 export default function Footer() {
-  const currentYear = new Date().getFullYear()
+  const pathname = usePathname()
+  const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
+
+  // Don't render on admin login page
+  if (pathname === '/admin/login') {
+    return null
+  }
+
+  useEffect(() => {
+    setCurrentYear(new Date().getFullYear())
+  }, [])
 
   return (
-    <footer className="bg-white border-t border-dark-200 lg:pl-64">
+    <footer className="bg-secondary border-t border-dark-200 lg:pl-64">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
           {/* Brand */}
@@ -39,7 +51,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 text-text-primary">Quick Links</h3>
             <ul className="space-y-2">
               {footerLinks.map((link) => (
                 <li key={link.name}>
@@ -56,7 +68,7 @@ export default function Footer() {
 
           {/* Social Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Connect</h3>
+            <h3 className="text-lg font-semibold mb-4 text-text-primary">Connect</h3>
             <div className="flex space-x-4">
               {socialLinks.map(({ name, icon: Icon, href }) => (
                 <motion.a
@@ -64,7 +76,7 @@ export default function Footer() {
                   href={href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-2 glass-modern rounded-lg hover:scale-110 transition-all"
+                  className="p-2 glass-modern rounded-lg hover:scale-110 transition-all text-text-primary"
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   whileTap={{ scale: 0.9 }}
                   aria-label={name}

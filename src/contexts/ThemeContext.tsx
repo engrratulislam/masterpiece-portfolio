@@ -8,39 +8,45 @@ interface ThemeContextType {
   theme: Theme;
   toggleTheme: () => void;
   setTheme: (theme: Theme) => void;
+  isHydrated: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>('light');
+  const [isHydrated, setIsHydrated] = useState(false);
 
-  // Initialize theme from localStorage or system preference
+  // Initialize theme after hydration
   useEffect(() => {
-    // Check localStorage first
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    
-    if (savedTheme) {
-      setThemeState(savedTheme);
-    } else {
-      // Fallback to system preference
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setThemeState(systemPrefersDark ? 'dark' : 'light');
-    }
+    // Check what theme was set by the script or default to light
+    const currentTheme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+    setThemeState(currentTheme);
+    setIsHydrated(true);
   }, []);
 
-  // Apply theme to document.documentElement
+  // Apply theme changes (only when user actively changes theme)
   useEffect(() => {
-    if (typeof document !== 'undefined') {
+    if (isHydrated) {
       const root = document.documentElement;
-      root.classList.remove('light', 'dark');
-      root.classList.add(theme);
-      root.style.colorScheme = theme; // Enable browser-level dark mode optimizations
       
-      // Update localStorage
-      localStorage.setItem('theme', theme);
+      // Only update if the theme actually changed from user interaction
+      const currentDOMTheme = root.classList.contains('dark') ? 'dark' : 'light';
+      if (currentDOMTheme !== theme) {
+        root.classList.remove('light', 'dark');
+        root.classList.add(theme);
+        root.style.colorScheme = theme;
+        
+        // Only update localStorage after hydration to avoid SSR issues
+        try {
+          localStorage.setItem('theme', theme);
+        } catch (e) {
+          // Handle cases where localStorage is not available
+          console.warn('Could not save theme to localStorage:', e);
+        }
+      }
     }
-  }, [theme]);
+  }, [theme, isHydrated]);
 
   const toggleTheme = () => {
     setThemeState(prev => prev === 'light' ? 'dark' : 'light');
@@ -54,6 +60,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     theme,
     toggleTheme,
     setTheme,
+    isHydrated,
   };
 
   return (
