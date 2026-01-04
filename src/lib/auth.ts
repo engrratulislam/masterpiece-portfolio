@@ -74,19 +74,24 @@ export const authConfig: NextAuthConfig = {
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) {
+          console.error('[AUTH] Missing credentials');
           throw new Error('Email and password are required');
         }
 
         const email = credentials.email as string;
         const password = credentials.password as string;
         
+        console.log('[AUTH] Authorize attempt for:', email);
+        
         // Get IP address for rate limiting
         const forwarded = req.headers?.get('x-forwarded-for');
         const ip = forwarded ? forwarded.split(',')[0] : req.headers?.get('x-real-ip') || 'unknown';
+        console.log('[AUTH] IP address:', ip);
 
         // Check rate limit
         const isAllowed = await checkRateLimit(ip);
         if (!isAllowed) {
+          console.error('[AUTH] Rate limit exceeded for IP:', ip);
           throw new Error('Too many failed login attempts. Please try again in 15 minutes.');
         }
 
@@ -100,38 +105,49 @@ export const authConfig: NextAuthConfig = {
         }
 
         // Query user from database
+        console.log('[AUTH] Querying database for user...');
         const users = await executeQuery<UserRow[]>(
           'SELECT id, email, password_hash, name, role, isActive FROM users WHERE email = ? LIMIT 1',
           [email]
         );
 
         if (users.length === 0) {
+          console.error('[AUTH] User not found:', email);
           throw new Error('Invalid email or password');
         }
 
         const user = users[0];
+        console.log('[AUTH] User found:', { id: user.id, email: user.email, role: user.role, isActive: user.isActive });
 
         // Check if user is active
         if (!user.isActive) {
+          console.error('[AUTH] User inactive:', email);
           throw new Error('Account is inactive. Please contact administrator.');
         }
 
         // Verify password
+        console.log('[AUTH] Verifying password...');
         const isValidPassword = await bcrypt.compare(password, user.password_hash);
+        console.log('[AUTH] Password valid:', isValidPassword);
 
         if (!isValidPassword) {
+          console.error('[AUTH] Invalid password for:', email);
           throw new Error('Invalid email or password');
         }
 
         // Reset rate limit on successful login
         await resetRateLimit(ip);
+        console.log('[AUTH] Rate limit reset for IP:', ip);
 
         // Update last login
         await executeQuery(
           'UPDATE users SET lastLogin = ? WHERE id = ?',
           [new Date(), user.id]
         );
+        console.log('[AUTH] Last login updated');
 
+        console.log('[AUTH] Authorization successful for:', email);
+        
         // Return user object
         return {
           id: user.id.toString(),

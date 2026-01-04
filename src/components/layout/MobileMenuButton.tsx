@@ -10,8 +10,8 @@ export default function MobileMenuButton() {
   const pathname = usePathname()
   const [isOpen, setIsOpen] = useState(false)
 
-  // Don't render on admin login page
-  if (pathname === '/admin/login') {
+  // Don't render on ANY admin pages - AFTER all hooks
+  if (pathname?.startsWith('/admin')) {
     return null
   }
 

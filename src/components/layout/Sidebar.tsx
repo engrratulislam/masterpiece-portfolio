@@ -17,20 +17,27 @@ const navItems = [
   { name: 'Contact', href: '#contact' },
 ]
 
-const socialLinks = [
-  { Icon: Linkedin, href: 'https://www.linkedin.com/in/engr-ratulislam/', label: 'LinkedIn' },
-  { Icon: Github, href: 'https://github.com/engrratulislam', label: 'GitHub' },
-  { Icon: Mail, href: 'mailto:ratul.innovations@gmail.com', label: 'Email' },
-]
+interface SocialLink {
+  Icon: typeof Github | typeof Linkedin | typeof Mail
+  href: string
+  label: string
+}
+
+interface ProfileData {
+  name: string
+  title: string
+  profileImage: string | null
+}
 
 export default function Sidebar() {
   const pathname = usePathname()
   const [activeSection, setActiveSection] = useState('hero')
-
-  // Don't render on admin login page
-  if (pathname === '/admin/login') {
-    return null
-  }
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([])
+  const [profileData, setProfileData] = useState<ProfileData>({
+    name: 'Engr. Ratul',
+    title: 'Software Developer',
+    profileImage: null,
+  })
 
   useEffect(() => {
     const handleScroll = () => {
@@ -55,6 +62,60 @@ export default function Sidebar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
+  // Fetch social links from footer_section table
+  useEffect(() => {
+    const fetchSocialLinks = async () => {
+      try {
+        const response = await fetch('/api/footer')
+        if (response.ok) {
+          const data = await response.json()
+          const footerData = data.data
+          
+          const links: SocialLink[] = []
+          if (footerData.linkedinUrl) {
+            links.push({ Icon: Linkedin, href: footerData.linkedinUrl, label: 'LinkedIn' })
+          }
+          if (footerData.githubUrl) {
+            links.push({ Icon: Github, href: footerData.githubUrl, label: 'GitHub' })
+          }
+          if (footerData.emailAddress) {
+            links.push({ Icon: Mail, href: `mailto:${footerData.emailAddress}`, label: 'Email' })
+          }
+          
+          setSocialLinks(links)
+        }
+      } catch (error) {
+        console.error('Error fetching social links:', error)
+      }
+    }
+    
+    fetchSocialLinks()
+  }, [])
+
+  // Fetch profile data from hero_section table
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const response = await fetch('/api/hero')
+        if (response.ok) {
+          const data = await response.json()
+          const heroData = data.data
+          
+          setProfileData({
+            name: heroData.name || 'Engr. Ratul',
+            title: heroData.title || 'Software Developer',
+            profileImage: heroData.profileImage || '/images/about/profile.jpeg',
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching profile data:', error)
+        // Keep default values on error
+      }
+    }
+    
+    fetchProfileData()
+  }, [])
+
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (href.startsWith('#')) {
       e.preventDefault()
@@ -63,6 +124,11 @@ export default function Sidebar() {
         element.scrollIntoView({ behavior: 'smooth' })
       }
     }
+  }
+
+  // Don't render on ANY admin pages - AFTER all hooks
+  if (pathname?.startsWith('/admin')) {
+    return null
   }
 
   return (
@@ -84,8 +150,8 @@ export default function Sidebar() {
             <div className="w-full h-full rounded-full bg-gradient-to-br from-accent-cool to-accent-warm p-0.5">
               <div className="w-full h-full rounded-full overflow-hidden bg-surface-light dark:bg-surface-dark">
                 <Image
-                  src="/images/about/profile.jpeg"
-                  alt="Engr. Ratul - Software Developer"
+                  src={profileData.profileImage || '/images/about/profile.jpeg'}
+                  alt={`${profileData.name} - ${profileData.title}`}
                   width={80}
                   height={80}
                   className="w-full h-full object-cover"
@@ -106,10 +172,10 @@ export default function Sidebar() {
             transition={{ type: 'spring', stiffness: 400 }}
           >
             <h1 className="text-xl font-bold font-display gradient-text-primary">
-              Engr. Ratul
+              {profileData.name}
             </h1>
             <p className="text-sm font-medium text-text-secondary">
-              Software Developer
+              {profileData.title}
             </p>
           </motion.div>
         </Link>
@@ -160,22 +226,28 @@ export default function Sidebar() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
       >
-        {socialLinks.map(({ Icon, href, label }) => (
-          <motion.a
-            key={label}
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 p-2 rounded-lg text-text-secondary hover:text-accent-cool hover:bg-text-secondary/10 transition-all group"
-            whileHover={{ x: 3 }}
-            aria-label={label}
-          >
-            <Icon className="w-5 h-5" />
-            <span className="text-sm font-medium">
-              {label}
-            </span>
-          </motion.a>
-        ))}
+        {socialLinks.length > 0 ? (
+          socialLinks.map(({ Icon, href, label }) => (
+            <motion.a
+              key={label}
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 p-2 rounded-lg text-text-secondary hover:text-accent-cool hover:bg-text-secondary/10 transition-all group"
+              whileHover={{ x: 3 }}
+              aria-label={label}
+            >
+              <Icon className="w-5 h-5" />
+              <span className="text-sm font-medium">
+                {label}
+              </span>
+            </motion.a>
+          ))
+        ) : (
+          <div className="text-center text-text-secondary text-sm py-4">
+            Loading...
+          </div>
+        )}
       </motion.div>
     </motion.aside>
   )

@@ -9,6 +9,8 @@ export async function authenticate(
   rememberMe: boolean
 ) {
   try {
+    console.log('[AUTH] Attempting login for:', email);
+    
     await signIn('credentials', {
       email,
       password,
@@ -16,8 +18,11 @@ export async function authenticate(
       redirect: false,
     });
 
+    console.log('[AUTH] Login successful for:', email);
     return { success: true };
   } catch (error) {
+    console.error('[AUTH] Login error:', error);
+    
     if (error instanceof AuthError) {
       switch (error.type) {
         case 'CredentialsSignin':

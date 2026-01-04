@@ -1,16 +1,75 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { ExternalLink, Github, X, ArrowUpRight, Calendar } from 'lucide-react'
-import { projects, type Project } from '@/data/projects'
 import ScrollReveal from '@/components/animations/ScrollReveal'
 import MagneticHover from '@/components/animations/MagneticHover'
+
+interface Project {
+  id: string
+  title: string
+  description: string
+  longDescription: string
+  image: string
+  images: string[]
+  category: 'web' | 'mobile' | 'design' | '3d'
+  tags: string[]
+  liveUrl?: string
+  githubUrl?: string
+  featured: boolean
+  date: string
+}
+
+interface ProjectsSection {
+  sectionBadge: string
+  sectionTitle: string
+  sectionDescription: string
+}
 
 export default function Projects() {
   const [filter, setFilter] = useState<'all' | Project['category']>('all')
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  const [projects, setProjects] = useState<Project[]>([])
+  const [loading, setLoading] = useState(true)
+  const [sectionData, setSectionData] = useState<ProjectsSection>({
+    sectionBadge: 'My Work',
+    sectionTitle: 'Featured Projects',
+    sectionDescription: 'Showcasing my best work in web development and creative coding',
+  })
+
+  useEffect(() => {
+    fetchProjects()
+    fetchSection()
+  }, [])
+
+  const fetchProjects = async () => {
+    try {
+      const response = await fetch('/api/projects')
+      if (response.ok) {
+        const data = await response.json()
+        setProjects(data.data || [])
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchSection = async () => {
+    try {
+      const response = await fetch('/api/projects-section')
+      if (response.ok) {
+        const data = await response.json()
+        setSectionData(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching section:', error)
+      // Keep default values on error
+    }
+  }
 
   const categories = [
     { value: 'all', label: 'All Projects' },
@@ -68,13 +127,13 @@ export default function Projects() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
-            My Work
+            {sectionData.sectionBadge}
           </motion.span>
           <h2 className="font-display font-bold text-fluid-4xl lg:text-fluid-5xl text-text-primary mb-4">
-            Featured <span className="gradient-text-primary">Projects</span>
+            {sectionData.sectionTitle.split(' ')[0]} <span className="gradient-text-primary">{sectionData.sectionTitle.split(' ').slice(1).join(' ')}</span>
           </h2>
           <p className="text-fluid-lg text-text-secondary max-w-2xl mx-auto">
-            Showcasing my best work in web development and creative coding
+            {sectionData.sectionDescription}
           </p>
         </div>
 
@@ -103,28 +162,36 @@ export default function Projects() {
         </motion.div>
 
         {/* Professional Bento Grid Layout - Clean and Balanced */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 auto-rows-[280px]">
-          <AnimatePresence mode="wait">
-            {filteredProjects.map((project, index) => (
-              <motion.div
-                key={project.id}
-                layout
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.5, delay: index * 0.08 }}
-                className={getBentoGridClass(index)}
-              >
-                <BentoProjectCard 
-                  project={project} 
-                  index={index}
-                  isLarge={index === 0 && project.featured}
-                  onClick={() => setSelectedProject(project)}
-                />
-              </motion.div>
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 auto-rows-[280px]">
+            {[...Array(6)].map((_, index) => (
+              <div key={index} className="card-glass animate-pulse h-full" />
             ))}
-          </AnimatePresence>
-        </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 auto-rows-[280px]">
+            <AnimatePresence mode="wait">
+              {filteredProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.5, delay: index * 0.08 }}
+                  className={getBentoGridClass(index)}
+                >
+                  <BentoProjectCard 
+                    project={project} 
+                    index={index}
+                    isLarge={index === 0 && project.featured}
+                    onClick={() => setSelectedProject(project)}
+                  />
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
 
         {filteredProjects.length === 0 && (
           <motion.div

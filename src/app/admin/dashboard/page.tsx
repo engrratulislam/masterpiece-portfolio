@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { FolderKanban, Code2, Briefcase, Mail, TrendingUp, Activity } from 'lucide-react';
+import { FolderKanban, Code2, Briefcase, Mail, TrendingUp, Activity, ImageIcon } from 'lucide-react';
 
 interface DashboardStats {
   totalProjects: number;
@@ -9,6 +9,7 @@ interface DashboardStats {
   totalExperience: number;
   totalMessages: number;
   unreadMessages: number;
+  totalMedia: number;
 }
 
 export default function DashboardPage() {
@@ -18,6 +19,7 @@ export default function DashboardPage() {
     totalExperience: 0,
     totalMessages: 0,
     unreadMessages: 0,
+    totalMedia: 0,
   });
   const [loading, setLoading] = useState(true);
 
@@ -73,6 +75,14 @@ export default function DashboardPage() {
       iconColor: 'text-green-500',
       badge: stats.unreadMessages > 0 ? stats.unreadMessages : null,
     },
+    {
+      title: 'Media Files',
+      value: stats.totalMedia,
+      icon: ImageIcon,
+      color: 'from-pink-500 to-rose-500',
+      bgColor: 'bg-pink-500/10',
+      iconColor: 'text-pink-500',
+    },
   ];
 
   return (
@@ -84,7 +94,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {statCards.map((card, index) => {
           const Icon = card.icon;
           

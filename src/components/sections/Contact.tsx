@@ -1,9 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import { Mail, Phone, MapPin, Send, Github, Linkedin, Twitter, Facebook, CheckCircle, AlertCircle } from 'lucide-react'
-import { contactInfo, getMailtoLink, getTelLink, getMapsLink } from '@/data/contact-info'
 import Parallax from '@/components/parallax/Parallax'
 
 interface FormData {
@@ -20,6 +19,22 @@ interface FormErrors {
   message?: string
 }
 
+interface ContactData {
+  sectionBadge: string
+  sectionTitle: string
+  sectionDescription: string | null
+  contactInfoTitle: string
+  contactInfoDescription: string | null
+  email: string
+  phone: string | null
+  location: string | null
+  socialTitle: string
+  githubUrl: string | null
+  linkedinUrl: string | null
+  twitterUrl: string | null
+  facebookUrl: string | null
+}
+
 export default function Contact() {
   const [formData, setFormData] = useState<FormData>({
     name: '',
@@ -28,9 +43,29 @@ export default function Contact() {
     message: '',
   })
 
+  const [contactData, setContactData] = useState<ContactData | null>(null)
+  const [loading, setLoading] = useState(true)
   const [errors, setErrors] = useState<FormErrors>({})
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+
+  useEffect(() => {
+    fetchContactData()
+  }, [])
+
+  const fetchContactData = async () => {
+    try {
+      const response = await fetch('/api/contact')
+      if (response.ok) {
+        const data = await response.json()
+        setContactData(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching contact data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
@@ -115,36 +150,36 @@ export default function Contact() {
     },
   }
 
-  const contactCards = [
+  const contactCards = contactData ? [
     {
       icon: Mail,
       label: 'Email',
-      value: contactInfo.email,
-      href: getMailtoLink(),
+      value: contactData.email,
+      href: `mailto:${contactData.email}`,
       color: 'from-blue-500 to-cyan-500',
     },
-    {
+    ...(contactData.phone ? [{
       icon: Phone,
       label: 'Phone',
-      value: contactInfo.phone,
-      href: getTelLink(),
+      value: contactData.phone,
+      href: `tel:${contactData.phone.replace(/\s/g, '')}`,
       color: 'from-green-500 to-teal-500',
-    },
-    {
+    }] : []),
+    ...(contactData.location ? [{
       icon: MapPin,
       label: 'Location',
-      value: contactInfo.location,
-      href: getMapsLink(),
+      value: contactData.location,
+      href: `https://maps.google.com/?q=${encodeURIComponent(contactData.location)}`,
       color: 'from-purple-500 to-pink-500',
-    },
-  ]
+    }] : []),
+  ] : []
 
-  const socialLinks = [
-    { icon: Github, href: contactInfo.social.github, label: 'GitHub', color: 'hover:text-gray-400' },
-    { icon: Linkedin, href: contactInfo.social.linkedin, label: 'LinkedIn', color: 'hover:text-blue-400' },
-    { icon: Twitter, href: contactInfo.social.twitter, label: 'Twitter', color: 'hover:text-sky-400' },
-    { icon: Facebook, href: contactInfo.social.facebook, label: 'Facebook', color: 'hover:text-blue-500' },
-  ]
+  const socialLinks = contactData ? [
+    ...(contactData.githubUrl ? [{ icon: Github, href: contactData.githubUrl, label: 'GitHub', color: 'hover:text-gray-400' }] : []),
+    ...(contactData.linkedinUrl ? [{ icon: Linkedin, href: contactData.linkedinUrl, label: 'LinkedIn', color: 'hover:text-blue-400' }] : []),
+    ...(contactData.twitterUrl ? [{ icon: Twitter, href: contactData.twitterUrl, label: 'Twitter', color: 'hover:text-sky-400' }] : []),
+    ...(contactData.facebookUrl ? [{ icon: Facebook, href: contactData.facebookUrl, label: 'Facebook', color: 'hover:text-blue-500' }] : []),
+  ] : []
 
   return (
     <section id="contact" className="relative py-20 md:py-32 bg-secondary overflow-hidden">
@@ -171,13 +206,13 @@ export default function Contact() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
-            Get In Touch
+            {loading ? 'Loading...' : (contactData?.sectionBadge || 'Get In Touch')}
           </motion.span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display mb-4 text-text-primary">
-            Let's Work <span className="gradient-text-primary">Together</span>
+            {loading ? 'Loading...' : (contactData?.sectionTitle || "Let's Work")} <span className="gradient-text-primary">Together</span>
           </h2>
           <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-            Have a project in mind? Let's discuss how I can help bring your ideas to life
+            {loading ? 'Loading...' : (contactData?.sectionDescription || "Have a project in mind? Let's discuss how I can help bring your ideas to life")}
           </p>
         </motion.div>
 
@@ -191,9 +226,11 @@ export default function Contact() {
                 viewport={{ once: true }}
               >
               <motion.div variants={itemVariants} className="mb-8">
-                <h3 className="text-2xl font-bold mb-4 text-text-primary">Contact Information</h3>
+                <h3 className="text-2xl font-bold mb-4 text-text-primary">
+                  {loading ? 'Loading...' : (contactData?.contactInfoTitle || 'Contact Information')}
+                </h3>
                 <p className="text-text-secondary">
-                  Feel free to reach out through any of these channels. I'm always open to discussing new projects and opportunities.
+                  {loading ? 'Loading...' : (contactData?.contactInfoDescription || 'Feel free to reach out through any of these channels. I\'m always open to discussing new projects and opportunities.')}
                 </p>
               </motion.div>
 
@@ -224,7 +261,9 @@ export default function Contact() {
 
               {/* Social Links */}
               <motion.div variants={itemVariants}>
-                <h4 className="text-lg font-semibold mb-4 text-text-primary">Follow Me</h4>
+                <h4 className="text-lg font-semibold mb-4 text-text-primary">
+                  {loading ? 'Loading...' : (contactData?.socialTitle || 'Follow Me')}
+                </h4>
                 <div className="flex gap-4">
                   {socialLinks.map((social, index) => (
                     <motion.a

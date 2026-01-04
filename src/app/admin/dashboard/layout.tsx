@@ -19,17 +19,24 @@ import {
   Bell,
   Moon,
   Sun,
+  Home,
+  User,
+  Layout,
 } from 'lucide-react';
 import { useTheme } from '@/contexts/ThemeContext';
 
 const sidebarLinks = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: LayoutDashboard },
+  { name: 'Hero Section', href: '/admin/dashboard/hero', icon: Home },
+  { name: 'About Section', href: '/admin/dashboard/about', icon: User },
   { name: 'Projects', href: '/admin/dashboard/projects', icon: FolderKanban },
   { name: 'Skills', href: '/admin/dashboard/skills', icon: Code2 },
   { name: 'Experience', href: '/admin/dashboard/experience', icon: Briefcase },
   { name: 'Testimonials', href: '/admin/dashboard/testimonials', icon: MessageSquare },
   { name: 'Messages', href: '/admin/dashboard/messages', icon: Mail },
   { name: 'Media Library', href: '/admin/dashboard/media', icon: Image },
+  { name: 'Contact Section', href: '/admin/dashboard/contact', icon: Mail },
+  { name: 'Footer Section', href: '/admin/dashboard/footer', icon: Layout },
   { name: 'Settings', href: '/admin/dashboard/settings', icon: Settings },
 ];
 

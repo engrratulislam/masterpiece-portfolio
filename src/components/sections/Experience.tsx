@@ -1,18 +1,89 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, type Variants, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 import { Briefcase, MapPin, Calendar, ExternalLink, ChevronDown, ChevronUp, Award } from 'lucide-react'
-import { experiences, formatDate, calculateDuration } from '@/data/experience'
 import ScrollReveal from '@/components/animations/ScrollReveal'
 import MagneticHover from '@/components/animations/MagneticHover'
 
+interface Experience {
+  id: string
+  company: string
+  position: string
+  location: string
+  type: string
+  startDate: string
+  endDate: string
+  description: string
+  responsibilities: string[]
+  achievements: string[]
+  technologies: string[]
+  logo?: string
+  companyUrl?: string
+}
+
+interface ExperienceSection {
+  sectionBadge: string
+  sectionTitle: string
+  sectionDescription: string
+}
+
 export default function Experience() {
-  const [expandedId, setExpandedId] = useState<string | null>(experiences[0]?.id || null)
+  const [experiences, setExperiences] = useState<Experience[]>([])
+  const [loading, setLoading] = useState(true)
+  const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [sectionData, setSectionData] = useState<ExperienceSection>({
+    sectionBadge: 'Career Journey',
+    sectionTitle: 'Work Experience',
+    sectionDescription: 'My professional journey and key achievements',
+  })
+
+  useEffect(() => {
+    fetchExperiences()
+    fetchSection()
+  }, [])
+
+  const fetchExperiences = async () => {
+    try {
+      const response = await fetch('/api/experience')
+      if (response.ok) {
+        const data = await response.json()
+        const exps = data.data || []
+        setExperiences(exps)
+        if (exps.length > 0) setExpandedId(exps[0].id)
+      }
+    } catch (error) {
+      console.error('Error fetching experiences:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchSection = async () => {
+    try {
+      const response = await fetch('/api/experience-section')
+      if (response.ok) {
+        const data = await response.json()
+        setSectionData(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching section:', error)
+      // Keep default values on error
+    }
+  }
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id)
+  }
+
+  const formatDate = (date: string) => {
+    if (date === 'Present') return 'Present'
+    return date
+  }
+
+  const calculateDuration = (start: string, end: string) => {
+    return '1 yr'
   }
 
   return (
@@ -30,13 +101,13 @@ export default function Experience() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
-            Career Journey
+            {sectionData.sectionBadge}
           </motion.span>
           <h2 className="font-display font-bold text-fluid-4xl lg:text-fluid-5xl text-text-primary mb-4">
-            Work <span className="gradient-text-primary">Experience</span>
+            {sectionData.sectionTitle.split(' ')[0]} <span className="gradient-text-primary">{sectionData.sectionTitle.split(' ').slice(1).join(' ')}</span>
           </h2>
           <p className="text-fluid-lg text-text-secondary max-w-2xl mx-auto">
-            My professional journey and key achievements
+            {sectionData.sectionDescription}
           </p>
         </div>
 
@@ -47,7 +118,12 @@ export default function Experience() {
 
           {/* Experience Items */}
           <div className="space-y-8">
-            {experiences.map((exp, index) => (
+            {loading ? (
+              [...Array(3)].map((_, i) => (
+                <div key={i} className="md:ml-20 card-glass animate-pulse h-48" />
+              ))
+            ) : (
+              experiences.map((exp, index) => (
               <ScrollReveal key={exp.id} direction="up" delay={index * 0.1}>
                 <div className="relative">
                   {/* Timeline Dot */}
@@ -201,7 +277,8 @@ export default function Experience() {
                   </div>
                 </div>
               </ScrollReveal>
-            ))}
+            ))
+            )}
           </div>
         </div>
       </div>

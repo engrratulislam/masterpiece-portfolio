@@ -5,7 +5,7 @@ export interface Project {
   longDescription: string
   image: string
   images: string[]
-  category: 'web' | 'mobile' | 'design' | '3d'
+  category: string // Changed from union type to string for custom categories
   tags: string[]
   liveUrl?: string
   githubUrl?: string
@@ -97,7 +97,7 @@ export interface ProjectDB {
   description: string
   longDescription: string | null
   image: string | null
-  category: 'web' | 'mobile' | 'design' | '3d'
+  category: string // Changed from union type to string for custom categories
   tags: string // JSON string
   liveUrl: string | null
   githubUrl: string | null
@@ -120,7 +120,7 @@ export interface SkillDB {
   name: string
   level: number
   icon: string | null
-  category: 'frontend' | 'backend' | 'design' | 'tools'
+  category: string // Changed from union type to string for custom categories
   displayOrder: number
   createdAt: Date
   updatedAt: Date
@@ -165,6 +165,151 @@ export interface MediaFile {
   uploadedAt: Date
 }
 
+export interface HeroSection {
+  id: number
+  badge: string
+  name: string
+  title: string
+  description: string
+  cvUrl: string | null
+  profileImage: string | null
+  yearsExperience: string
+  projectsCompleted: string
+  satisfactionRate: string
+  // Tech Stack Fields
+  tech1: string | null
+  tech2: string | null
+  tech3: string | null
+  tech4: string | null
+  tech5: string | null
+  tech6: string | null
+  tech7: string | null
+  tech8: string | null
+  tech9: string | null
+  isActive: boolean
+  updatedAt: Date
+}
+
+export interface AboutSection {
+  id: number
+  sectionBadge: string
+  sectionTitle: string
+  sectionDescription: string | null
+  profileImage: string | null
+  heading: string | null
+  paragraph1: string
+  paragraph2: string | null
+  paragraph3: string | null
+  cvUrl: string | null
+  yearsExperience: string
+  projectsCompleted: string
+  clientSatisfaction: string
+  isActive: boolean
+  updatedAt: Date
+}
+
+export interface FooterSection {
+  id: number
+  brandName: string
+  brandDescription: string
+  quickLinksTitle: string
+  // Quick Links (Individual Fields)
+  quickLink1Name: string | null
+  quickLink1Href: string | null
+  quickLink2Name: string | null
+  quickLink2Href: string | null
+  quickLink3Name: string | null
+  quickLink3Href: string | null
+  quickLink4Name: string | null
+  quickLink4Href: string | null
+  socialTitle: string
+  // Social Links (Synced with Sidebar)
+  githubUrl: string | null
+  linkedinUrl: string | null
+  emailAddress: string | null
+  copyrightText: string
+  footerNote: string | null
+  isActive: boolean
+  updatedAt: Date
+}
+
+export interface ContactSection {
+  id: number
+  sectionBadge: string
+  sectionTitle: string
+  sectionDescription: string | null
+  contactInfoTitle: string
+  contactInfoDescription: string | null
+  email: string
+  phone: string | null
+  location: string | null
+  socialTitle: string
+  githubUrl: string | null
+  linkedinUrl: string | null
+  twitterUrl: string | null
+  facebookUrl: string | null
+  isActive: boolean
+  updatedAt: Date
+}
+
+export interface ProjectsSection {
+  id: number
+  sectionBadge: string
+  sectionTitle: string
+  sectionDescription: string
+  isActive: boolean
+  updatedAt: Date
+}
+
+export interface SkillsSection {
+  id: number
+  sectionBadge: string
+  sectionTitle: string
+  sectionDescription: string
+  isActive: boolean
+  updatedAt: Date
+}
+
+export interface ExperienceSection {
+  id: number
+  sectionBadge: string
+  sectionTitle: string
+  sectionDescription: string
+  isActive: boolean
+  updatedAt: Date
+}
+
+export interface TestimonialsSection {
+  id: number
+  sectionBadge: string
+  sectionTitle: string
+  sectionDescription: string
+  isActive: boolean
+  updatedAt: Date
+}
+
+export interface Category {
+  id: number
+  name: string
+  slug: string
+  displayOrder: number
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface SkillCategory {
+  id: number
+  name: string
+  slug: string
+  description?: string
+  icon?: string
+  displayOrder: number
+  isActive: boolean
+  createdAt: Date
+  updatedAt: Date
+}
+
 // API Response Types
 export interface ApiResponse<T = unknown> {
   success: boolean
@@ -179,5 +324,6 @@ export interface DashboardStats {
   totalExperience: number
   totalMessages: number
   unreadMessages: number
+  totalMedia: number
 }
 

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import Image from 'next/image'
 import { Download, Github, Linkedin, Mail, Code2, Rocket, Zap, Award } from 'lucide-react'
@@ -8,7 +9,99 @@ import ScrollReveal from '@/components/animations/ScrollReveal'
 import MagneticHover from '@/components/animations/MagneticHover'
 import { contactInfo } from '@/data/contact-info'
 
+interface AboutData {
+  sectionBadge: string
+  sectionTitle: string
+  sectionDescription: string | null
+  profileImage: string | null
+  heading: string | null
+  paragraph1: string
+  paragraph2: string | null
+  paragraph3: string | null
+  cvUrl: string | null
+  yearsExperience: string
+  projectsCompleted: string
+  clientSatisfaction: string
+}
+
+interface SocialLink {
+  icon: typeof Github | typeof Linkedin | typeof Mail
+  href: string
+  label: string
+  color: string
+}
+
 export default function About() {
+  const [aboutData, setAboutData] = useState<AboutData | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
+    { icon: Github, href: contactInfo.social.github, label: 'GitHub', color: 'hover:text-dark-900' },
+    { icon: Linkedin, href: contactInfo.social.linkedin, label: 'LinkedIn', color: 'hover:text-blue-600' },
+    { icon: Mail, href: `mailto:${contactInfo.email}`, label: 'Email', color: 'hover:text-warm-500' },
+  ])
+
+  useEffect(() => {
+    fetchAboutData()
+    fetchSocialLinks()
+  }, [])
+
+  const fetchAboutData = async () => {
+    try {
+      const response = await fetch('/api/about')
+      if (response.ok) {
+        const data = await response.json()
+        setAboutData(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching about data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // Fetch social links from footer_section table
+  const fetchSocialLinks = async () => {
+    try {
+      const response = await fetch('/api/footer')
+      if (response.ok) {
+        const data = await response.json()
+        const footerData = data.data
+        
+        const links: SocialLink[] = []
+        if (footerData.githubUrl) {
+          links.push({ 
+            icon: Github, 
+            href: footerData.githubUrl, 
+            label: 'GitHub', 
+            color: 'hover:text-dark-900' 
+          })
+        }
+        if (footerData.linkedinUrl) {
+          links.push({ 
+            icon: Linkedin, 
+            href: footerData.linkedinUrl, 
+            label: 'LinkedIn', 
+            color: 'hover:text-blue-600' 
+          })
+        }
+        if (footerData.emailAddress) {
+          links.push({ 
+            icon: Mail, 
+            href: `mailto:${footerData.emailAddress}`, 
+            label: 'Email', 
+            color: 'hover:text-warm-500' 
+          })
+        }
+        
+        if (links.length > 0) {
+          setSocialLinks(links)
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching social links:', error)
+      // Keep default values on error
+    }
+  }
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -43,29 +136,25 @@ export default function About() {
   const highlights = [
     {
       icon: Code2,
-      title: '3+ Years',
+      title: aboutData?.yearsExperience || '3+ Years',
       description: 'Professional Experience',
       color: 'from-cool-500 to-gradient-start',
     },
     {
       icon: Rocket,
-      title: '50+ Projects',
+      title: aboutData?.projectsCompleted || '50+ Projects',
       description: 'Successfully Delivered',
       color: 'from-warm-500 to-gold-500',
     },
     {
       icon: Award,
-      title: '100% Client',
+      title: aboutData?.clientSatisfaction || '100% Client',
       description: 'Satisfaction Rate',
       color: 'from-gradient-start to-gradient-end',
     },
   ]
 
-  const socialLinks = [
-    { icon: Github, href: contactInfo.social.github, label: 'GitHub', color: 'hover:text-dark-900' },
-    { icon: Linkedin, href: contactInfo.social.linkedin, label: 'LinkedIn', color: 'hover:text-blue-600' },
-    { icon: Mail, href: `mailto:${contactInfo.email}`, label: 'Email', color: 'hover:text-warm-500' },
-  ]
+
 
   return (
     <section id="about" className="relative py-24 lg:py-32 bg-secondary overflow-hidden">
@@ -83,13 +172,13 @@ export default function About() {
           {/* Section Header */}
           <motion.div variants={itemVariants} className="text-center mb-20">
             <span className="inline-block px-4 py-2 glass-modern rounded-full text-sm font-semibold text-text-primary mb-4">
-              Get to Know Me
+              {loading ? 'Loading...' : (aboutData?.sectionBadge || 'Get to Know Me')}
             </span>
             <h2 className="font-display font-bold text-fluid-4xl lg:text-fluid-5xl text-text-primary mb-4">
-              About <span className="gradient-text-cool">Me</span>
+              {loading ? 'About' : (aboutData?.sectionTitle?.split(' ')[0] || 'About')} <span className="gradient-text-cool">{loading ? 'Me' : (aboutData?.sectionTitle?.split(' ').slice(1).join(' ') || 'Me')}</span>
             </h2>
             <p className="text-fluid-lg text-text-secondary max-w-2xl mx-auto">
-              Passionate developer crafting exceptional digital experiences
+              {loading ? 'Loading...' : (aboutData?.sectionDescription || 'Passionate developer crafting exceptional digital experiences')}
             </p>
           </motion.div>
 
@@ -121,7 +210,7 @@ export default function About() {
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                 >
                   <div className="text-center text-white">
-                    <div className="text-4xl font-bold">3+</div>
+                    <div className="text-4xl font-bold">{aboutData?.yearsExperience || '3+'}</div>
                     <div className="text-sm font-medium opacity-90">Years</div>
                   </div>
                 </motion.div>
@@ -133,44 +222,50 @@ export default function About() {
               <div className="space-y-6">
                 <div>
                   <h3 className="font-display font-bold text-fluid-3xl text-text-primary mb-6 min-h-[4rem]">
-                    <TypeAnimation
-                      sequence={[
-                        "Hi, I'm Engr. Ratul",
-                        2000,
-                        "I'm a Full Stack Developer",
-                        2000,
-                        "I Build Amazing Products",
-                        2000,
-                      ]}
-                      wrapper="span"
-                      speed={50}
-                      repeat={Infinity}
-                      className="gradient-text-cool"
-                    />
+                    {loading ? (
+                      <span className="gradient-text-cool">Loading...</span>
+                    ) : aboutData?.heading ? (
+                      <span className="gradient-text-cool">{aboutData.heading}</span>
+                    ) : (
+                      <TypeAnimation
+                        sequence={[
+                          "Hi, I'm Engr. Ratul",
+                          2000,
+                          "I'm a Full Stack Developer",
+                          2000,
+                          "I Build Amazing Products",
+                          2000,
+                        ]}
+                        wrapper="span"
+                        speed={50}
+                        repeat={Infinity}
+                        className="gradient-text-cool"
+                      />
+                    )}
                   </h3>
                   
                   <p className="text-fluid-base text-text-secondary leading-relaxed mb-4">
-                    A passionate <span className="font-semibold text-accent-cool">Full Stack Developer</span> with
-                    over 3 years of experience building modern web applications. I specialize in creating scalable,
-                    performant, and user-friendly solutions using cutting-edge technologies.
+                    {loading ? 'Loading...' : (aboutData?.paragraph1 || 'A passionate Full Stack Developer with over 3 years of experience building modern web applications.')}
                   </p>
                   
-                  <p className="text-fluid-base text-text-secondary leading-relaxed mb-4">
-                    With a strong foundation in both frontend and backend development, I bring ideas to
-                    life through clean code, thoughtful design, and innovative problem-solving.
-                  </p>
+                  {aboutData?.paragraph2 && (
+                    <p className="text-fluid-base text-text-secondary leading-relaxed mb-4">
+                      {aboutData.paragraph2}
+                    </p>
+                  )}
                   
-                  <p className="text-fluid-base text-text-secondary leading-relaxed">
-                    When I'm not coding, you'll find me exploring new technologies, contributing to
-                    open-source projects, or sharing knowledge with the developer community.
-                  </p>
+                  {aboutData?.paragraph3 && (
+                    <p className="text-fluid-base text-text-secondary leading-relaxed">
+                      {aboutData.paragraph3}
+                    </p>
+                  )}
                 </div>
 
                 {/* CTA & Social */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 pt-4">
                   <MagneticHover strength={12}>
                     <a
-                      href="/images/about/Ratul-Islam-curriculum-vitae.pdf"
+                      href={aboutData?.cvUrl || '/images/about/Ratul-Islam-curriculum-vitae.pdf'}
                       download="Ratul-Islam-Resume.pdf"
                       className="inline-flex items-center gap-3 px-8 py-4 bg-gradient-primary text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group"
                     >

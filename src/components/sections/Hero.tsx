@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion, type Variants } from 'framer-motion'
 import { ArrowRight, Download, Sparkles, Code2 } from 'lucide-react'
 import dynamic from 'next/dynamic'
@@ -12,7 +13,47 @@ const Scene3D = dynamic(() => import('@/components/three/Scene'), {
   loading: () => <div className="w-full h-full bg-gradient-to-br from-gradient-start/10 to-gradient-end/10 animate-pulse" />,
 })
 
+interface HeroData {
+  badge: string
+  name: string
+  title: string
+  description: string
+  cvUrl: string | null
+  yearsExperience: string
+  projectsCompleted: string
+  satisfactionRate: string
+  tech1: string | null
+  tech2: string | null
+  tech3: string | null
+  tech4: string | null
+  tech5: string | null
+  tech6: string | null
+  tech7: string | null
+  tech8: string | null
+  tech9: string | null
+}
+
 export default function Hero() {
+  const [heroData, setHeroData] = useState<HeroData | null>(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetchHeroData()
+  }, [])
+
+  const fetchHeroData = async () => {
+    try {
+      const response = await fetch('/api/hero')
+      if (response.ok) {
+        const data = await response.json()
+        setHeroData(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching hero data:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -76,7 +117,9 @@ export default function Hero() {
             <motion.div variants={itemVariants}>
               <div className="inline-flex items-center gap-2 px-4 py-2 glass-modern rounded-full shadow-lg">
                 <Sparkles className="w-4 h-4 text-accent-cool animate-pulse" />
-                <span className="text-sm font-semibold text-text-primary">Available for Projects</span>
+                <span className="text-sm font-semibold text-text-primary">
+                  {loading ? 'Loading...' : (heroData?.badge || 'Available for Projects')}
+                </span>
               </div>
             </motion.div>
 
@@ -84,10 +127,10 @@ export default function Hero() {
             <motion.div variants={itemVariants} className="space-y-4">
               <h1 className="font-display font-bold leading-[1.1] tracking-tight">
                 <span className="block text-fluid-3xl lg:text-fluid-5xl text-text-primary">
-                  Engr. Ratul
+                  {loading ? '...' : (heroData?.name || 'Engr. Ratul')}
                 </span>
                 <span className="block text-fluid-4xl lg:text-fluid-6xl gradient-text-cool mt-2">
-                  Full Stack Developer
+                  {loading ? '...' : (heroData?.title || 'Full Stack Developer')}
                 </span>
               </h1>
             </motion.div>
@@ -97,8 +140,9 @@ export default function Hero() {
               variants={itemVariants}
               className="text-fluid-lg text-text-secondary leading-relaxed max-w-xl"
             >
-              Crafting exceptional digital experiences with modern technologies. 
-              Specialized in building scalable architectures and seamless user interfaces.
+              {loading
+                ? 'Loading description...'
+                : (heroData?.description || 'Crafting exceptional digital experiences with modern technologies.')}
             </motion.p>
 
             {/* CTA Buttons */}
@@ -119,7 +163,7 @@ export default function Hero() {
 
               <MagneticHover strength={12}>
                 <a
-                  href="/images/about/Ratul-Islam-curriculum-vitae.pdf"
+                  href={heroData?.cvUrl || '/images/about/Ratul-Islam-curriculum-vitae.pdf'}
                   download="Ratul-Islam-Resume.pdf"
                   className="group inline-flex items-center justify-center gap-3 px-8 py-4 glass-modern border-2 text-text-primary font-semibold rounded-xl hover:border-accent-cool transition-all duration-300"
                 >
@@ -135,9 +179,9 @@ export default function Hero() {
               className="grid grid-cols-3 gap-6 pt-8"
             >
               {[
-                { value: '3+', label: 'Years Exp' },
-                { value: '50+', label: 'Projects' },
-                { value: '100%', label: 'Satisfaction' },
+                { value: heroData?.yearsExperience || '3+', label: 'Years Exp' },
+                { value: heroData?.projectsCompleted || '50+', label: 'Projects' },
+                { value: heroData?.satisfactionRate || '100%', label: 'Satisfaction' },
               ].map((stat, index) => (
                 <div key={index} className="text-center lg:text-left">
                   <div className="text-fluid-3xl font-display font-bold gradient-text-primary">
@@ -167,7 +211,9 @@ export default function Hero() {
                     Experience
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-text-primary mb-2">3+ Years</p>
+                <p className="text-3xl font-bold text-text-primary mb-2">
+                  {loading ? '...' : (heroData?.yearsExperience || '3+')} Years
+                </p>
                 <p className="text-sm text-text-secondary">Building digital products</p>
               </div>
             </ScrollReveal>
@@ -183,7 +229,9 @@ export default function Hero() {
                     Projects
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-text-primary mb-2">50+</p>
+                <p className="text-3xl font-bold text-text-primary mb-2">
+                  {loading ? '...' : (heroData?.projectsCompleted || '50+')}
+                </p>
                 <p className="text-sm text-text-secondary">Completed successfully</p>
               </div>
             </ScrollReveal>
@@ -196,31 +244,32 @@ export default function Hero() {
                   Tech Stack
                 </h3>
                 <div className="flex flex-wrap gap-2">
-                  {[
-                    { name: 'JavaScript', color: '#FBBF24', bgColor: 'yellow' },
-                    { name: 'React', color: '#3B82F6', bgColor: 'blue' },
-                    { name: 'Next.js', color: '#1F2937', bgColor: 'gray' },
-                    { name: 'TypeScript', color: '#2563EB', bgColor: 'blue' },
-                    { name: 'Node.js', color: '#10B981', bgColor: 'green' },
-                    { name: 'PHP', color: '#6366F1', bgColor: 'indigo' },
-                    { name: 'Laravel', color: '#EF4444', bgColor: 'red' },
-                    { name: 'MongoDB', color: '#059669', bgColor: 'emerald' },
-                    { name: 'MySQL', color: '#1E40AF', bgColor: 'blue' },
-                  ].map((tech) => (
-                    <motion.span
-                      key={tech.name}
-                      className="px-3 py-1.5 glass-modern border-2 rounded-lg text-xs font-medium text-text-primary transition-all duration-300 cursor-default"
-                      whileHover={{
-                        backgroundColor: `${tech.color}20`,
-                        borderColor: tech.color,
-                        color: tech.color,
-                        scale: 1.05,
-                      }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      {tech.name}
-                    </motion.span>
-                  ))}
+                  {heroData && [
+                    heroData.tech1,
+                    heroData.tech2,
+                    heroData.tech3,
+                    heroData.tech4,
+                    heroData.tech5,
+                    heroData.tech6,
+                    heroData.tech7,
+                    heroData.tech8,
+                    heroData.tech9,
+                  ]
+                    .filter((tech): tech is string => tech !== null && tech !== '')
+                    .map((tech) => (
+                      <motion.span
+                        key={tech}
+                        className="px-3 py-1.5 glass-modern border-2 rounded-lg text-xs font-medium text-text-primary transition-all duration-300 cursor-default"
+                        whileHover={{
+                          backgroundColor: `rgba(59, 130, 246, 0.1)`,
+                          borderColor: '#3B82F6',
+                          scale: 1.05,
+                        }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        {tech}
+                      </motion.span>
+                    ))}
                 </div>
               </div>
             </ScrollReveal>

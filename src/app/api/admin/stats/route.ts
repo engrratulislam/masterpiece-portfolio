@@ -19,12 +19,13 @@ export async function GET() {
     }
 
     // Fetch all statistics in parallel
-    const [projectsResult, skillsResult, experienceResult, messagesResult, unreadResult] = await Promise.all([
+    const [projectsResult, skillsResult, experienceResult, messagesResult, unreadResult, mediaResult] = await Promise.all([
       executeQuery<CountResult[]>('SELECT COUNT(*) as count FROM projects'),
       executeQuery<CountResult[]>('SELECT COUNT(*) as count FROM skills'),
       executeQuery<CountResult[]>('SELECT COUNT(*) as count FROM work_experience'),
       executeQuery<CountResult[]>('SELECT COUNT(*) as count FROM contact_messages'),
       executeQuery<CountResult[]>('SELECT COUNT(*) as count FROM contact_messages WHERE isRead = false'),
+      executeQuery<CountResult[]>('SELECT COUNT(*) as count FROM media_library'),
     ]);
 
     const stats = {
@@ -33,6 +34,7 @@ export async function GET() {
       totalExperience: experienceResult[0].count,
       totalMessages: messagesResult[0].count,
       unreadMessages: unreadResult[0].count,
+      totalMedia: mediaResult[0].count,
     };
 
     return NextResponse.json({ success: true, data: stats });

@@ -4,12 +4,68 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence, type Variants } from 'framer-motion'
 import Image from 'next/image'
 import { Star, Quote, ChevronLeft, ChevronRight } from 'lucide-react'
-import { testimonials, getAverageRating, getTotalTestimonials } from '@/data/testimonials'
 import Parallax from '@/components/parallax/Parallax'
 
+interface Testimonial {
+  id: string
+  name: string
+  position: string
+  company: string
+  image: string
+  rating: number
+  text: string
+  date: string
+  projectType?: string
+}
+
+interface TestimonialsSection {
+  sectionBadge: string
+  sectionTitle: string
+  sectionDescription: string
+}
+
 export default function Testimonials() {
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([])
+  const [loading, setLoading] = useState(true)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [direction, setDirection] = useState(0)
+  const [sectionData, setSectionData] = useState<TestimonialsSection>({
+    sectionBadge: 'Client Feedback',
+    sectionTitle: 'What Clients Say',
+    sectionDescription: "Don't just take my word for it - hear from some of the clients I've worked with",
+  })
+
+  useEffect(() => {
+    fetchTestimonials()
+    fetchSection()
+  }, [])
+
+  const fetchTestimonials = async () => {
+    try {
+      const response = await fetch('/api/testimonials')
+      if (response.ok) {
+        const data = await response.json()
+        setTestimonials(data.data || [])
+      }
+    } catch (error) {
+      console.error('Error fetching testimonials:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const fetchSection = async () => {
+    try {
+      const response = await fetch('/api/testimonials-section')
+      if (response.ok) {
+        const data = await response.json()
+        setSectionData(data.data)
+      }
+    } catch (error) {
+      console.error('Error fetching section:', error)
+      // Keep default values on error
+    }
+  }
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -34,7 +90,9 @@ export default function Testimonials() {
     setCurrentIndex(index)
   }
 
-  const currentTestimonial = testimonials[currentIndex]
+  const currentTestimonial = testimonials[currentIndex] || null
+  const getAverageRating = () => (testimonials.length > 0 ? (testimonials.reduce((sum, t) => sum + t.rating, 0) / testimonials.length).toFixed(1) : '5.0')
+  const getTotalTestimonials = () => testimonials.length
 
   const slideVariants: Variants = {
     enter: (direction: number) => ({
@@ -76,18 +134,21 @@ export default function Testimonials() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
-            Client Feedback
+            {sectionData.sectionBadge}
           </motion.span>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold font-display mb-4 text-text-primary">
-            What Clients <span className="gradient-text-primary">Say</span>
+            {sectionData.sectionTitle.split(' ').slice(0, -1).join(' ')} <span className="gradient-text-primary">{sectionData.sectionTitle.split(' ').slice(-1)[0]}</span>
           </h2>
           <p className="text-text-secondary text-lg max-w-2xl mx-auto">
-            Don't just take my word for it - hear from some of the clients I've worked with
+            {sectionData.sectionDescription}
           </p>
         </motion.div>
 
         {/* Testimonial Carousel */}
           <div className="max-w-5xl mx-auto">
+          {loading ? (
+            <div className="card-glass animate-pulse h-96" />
+          ) : currentTestimonial ? (
           <div className="relative min-h-[500px] md:min-h-[400px]">
             <AnimatePresence initial={false} custom={direction} mode="wait">
               <motion.div
@@ -200,6 +261,7 @@ export default function Testimonials() {
               <ChevronRight className="w-6 h-6 text-text-secondary group-hover:text-text-primary" />
             </button>
           </div>
+          ) : null}
 
           {/* Dots Navigation */}
           <div className="flex justify-center gap-2 mt-8">
