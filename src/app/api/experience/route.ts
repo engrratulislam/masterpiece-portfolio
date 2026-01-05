@@ -7,8 +7,12 @@ interface ExperienceRow extends RowDataPacket {
   company: string;
   position: string;
   duration: string;
+  location: string;
   description: string;
+  responsibilities: string;
+  achievements: string;
   logo: string | null;
+  companyUrl: string | null;
   technologies: string;
   displayOrder: number;
   createdAt: Date;
@@ -26,16 +30,16 @@ export async function GET() {
       id: exp.id.toString(),
       company: exp.company,
       position: exp.position,
-      location: 'Remote', // Default location
+      location: exp.location || 'Remote',
       type: 'full-time' as const,
       startDate: exp.duration.split(' - ')[0] || exp.duration,
       endDate: exp.duration.includes('Present') ? 'Present' : (exp.duration.split(' - ')[1] || 'Present'),
       description: exp.description,
-      responsibilities: [], // Can be added to schema later
-      achievements: [], // Can be added to schema later
+      responsibilities: exp.responsibilities ? JSON.parse(exp.responsibilities) : [],
+      achievements: exp.achievements ? JSON.parse(exp.achievements) : [],
       technologies: JSON.parse(exp.technologies || '[]'),
       logo: exp.logo,
-      companyUrl: undefined,
+      companyUrl: exp.companyUrl || undefined,
     }));
 
     return NextResponse.json({

@@ -31,9 +31,19 @@ interface SocialLink {
   color: string
 }
 
+interface TechStackSkill {
+  id: number
+  name: string
+  icon: string
+  level: number
+  color: string
+}
+
 export default function About() {
   const [aboutData, setAboutData] = useState<AboutData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [techStack, setTechStack] = useState<TechStackSkill[]>([])
+  const [techStackLoading, setTechStackLoading] = useState(true)
   const [socialLinks, setSocialLinks] = useState<SocialLink[]>([
     { icon: Github, href: contactInfo.social.github, label: 'GitHub', color: 'hover:text-dark-900' },
     { icon: Linkedin, href: contactInfo.social.linkedin, label: 'LinkedIn', color: 'hover:text-blue-600' },
@@ -43,6 +53,7 @@ export default function About() {
   useEffect(() => {
     fetchAboutData()
     fetchSocialLinks()
+    fetchTechStack()
   }, [])
 
   const fetchAboutData = async () => {
@@ -102,6 +113,31 @@ export default function About() {
       // Keep default values on error
     }
   }
+
+  // Fetch tech stack skills from About Skills API
+  const fetchTechStack = async () => {
+    try {
+      const response = await fetch('/api/about/skills')
+      if (response.ok) {
+        const data = await response.json()
+        if (data.data && data.data.length > 0) {
+          setTechStack(data.data)
+        } else {
+          // Fallback to hardcoded tech stack if no skills are selected
+          setTechStack(defaultTechStack)
+        }
+      } else {
+        // Fallback on error
+        setTechStack(defaultTechStack)
+      }
+    } catch (error) {
+      console.error('Error fetching tech stack:', error)
+      // Fallback to hardcoded tech stack on error
+      setTechStack(defaultTechStack)
+    } finally {
+      setTechStackLoading(false)
+    }
+  }
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -122,15 +158,16 @@ export default function About() {
     },
   }
 
-  const techStack = [
-    { name: 'React', icon: '⚛️', level: 95 },
-    { name: 'Next.js', icon: '▲', level: 92 },
-    { name: 'TypeScript', icon: 'TS', level: 90 },
-    { name: 'Node.js', icon: '🟢', level: 88 },
-    { name: 'Laravel', icon: '🔴', level: 85 },
-    { name: 'MongoDB', icon: '🍃', level: 87 },
-    { name: 'Docker', icon: '🐳', level: 82 },
-    { name: 'AWS', icon: '☁️', level: 80 },
+  // Default/fallback tech stack (matches original hardcoded values)
+  const defaultTechStack: TechStackSkill[] = [
+    { id: 0, name: 'React', icon: '⚛️', level: 95, color: 'from-blue-500 to-cyan-500' },
+    { id: 0, name: 'Next.js', icon: '▲', level: 92, color: 'from-blue-500 to-cyan-500' },
+    { id: 0, name: 'TypeScript', icon: 'TS', level: 90, color: 'from-blue-500 to-cyan-500' },
+    { id: 0, name: 'Node.js', icon: '🟢', level: 88, color: 'from-green-500 to-emerald-500' },
+    { id: 0, name: 'Laravel', icon: '🔴', level: 85, color: 'from-green-500 to-emerald-500' },
+    { id: 0, name: 'MongoDB', icon: '🍃', level: 87, color: 'from-orange-500 to-red-500' },
+    { id: 0, name: 'Docker', icon: '🐳', level: 82, color: 'from-orange-500 to-red-500' },
+    { id: 0, name: 'AWS', icon: '☁️', level: 80, color: 'from-orange-500 to-red-500' },
   ]
 
   const highlights = [
@@ -326,32 +363,62 @@ export default function About() {
               <p className="text-text-secondary">Technologies I work with daily</p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {techStack.map((tech, index) => (
-                <ScrollReveal key={tech.name} direction="up" delay={index * 0.05}>
-                  <div className="card-glass group hover:scale-105 transition-all duration-300">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="text-4xl">{tech.icon}</div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-text-primary mb-1">{tech.name}</div>
-                        <div className="text-xs text-text-secondary">{tech.level}% Proficiency</div>
-                      </div>
-                    </div>
-                    
-                    {/* Progress Bar */}
-                    <div className="w-full h-2 bg-text-secondary/20 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full bg-gradient-cool rounded-full"
-                        initial={{ width: 0 }}
-                        whileInView={{ width: `${tech.level}%` }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 1, delay: index * 0.1, ease: 'easeOut' }}
+            {techStackLoading ? (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[...Array(8)].map((_, i) => (
+                  <div key={i} className="card-glass animate-pulse h-24" />
+                ))}
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {techStack.map((tech, index) => {
+                  // Handle both image and emoji icons
+                  const iconDisplay = tech.icon ? (
+                    tech.icon.startsWith('/') ? (
+                      <img
+                        src={tech.icon}
+                        alt={tech.name}
+                        className="w-10 h-10 object-contain"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = 'none';
+                        }}
                       />
+                    ) : (
+                      <div className="text-4xl">{tech.icon}</div>
+                    )
+                  ) : (
+                    <div className="w-10 h-10 flex items-center justify-center bg-gradient-cool rounded-lg text-white font-bold">
+                      {tech.name.charAt(0)}
                     </div>
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
+                  )
+
+                  return (
+                    <ScrollReveal key={tech.id || tech.name} direction="up" delay={index * 0.05}>
+                      <div className="card-glass group hover:scale-105 transition-all duration-300">
+                        <div className="flex items-center gap-4 mb-4">
+                          {iconDisplay}
+                          <div className="flex-1">
+                            <div className="font-semibold text-text-primary mb-1">{tech.name}</div>
+                            <div className="text-xs text-text-secondary">{tech.level}% Proficiency</div>
+                          </div>
+                        </div>
+                        
+                        {/* Progress Bar */}
+                        <div className="w-full h-2 bg-text-secondary/20 rounded-full overflow-hidden">
+                          <motion.div
+                            className={`h-full bg-gradient-to-r ${tech.color} rounded-full`}
+                            initial={{ width: 0 }}
+                            whileInView={{ width: `${tech.level}%` }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 1, delay: index * 0.1, ease: 'easeOut' }}
+                          />
+                        </div>
+                      </div>
+                    </ScrollReveal>
+                  )
+                })}
+              </div>
+            )}
           </motion.div>
         </motion.div>
       </div>

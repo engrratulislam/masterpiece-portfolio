@@ -146,14 +146,51 @@ CREATE TABLE IF NOT EXISTS skills (
     INDEX idx_skills_category (category)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- 8.5. About Skills Table (Junction table for skills displayed in About section)
+CREATE TABLE IF NOT EXISTS about_skills (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    skillId INT NOT NULL,
+    displayOrder INT DEFAULT 0,
+    isActive BOOLEAN DEFAULT true,
+    createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (skillId) REFERENCES skills(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_skill (skillId),
+    INDEX idx_about_skills_active (isActive),
+    INDEX idx_about_skills_order (displayOrder)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insert default skills for About section (based on hardcoded techStack)
+INSERT INTO about_skills (skillId, displayOrder, isActive)
+SELECT s.id, 
+    CASE s.name
+        WHEN 'React' THEN 1
+        WHEN 'Next.js' THEN 2
+        WHEN 'TypeScript' THEN 3
+        WHEN 'Node.js' THEN 4
+        WHEN 'Laravel' THEN 5
+        WHEN 'MongoDB' THEN 6
+        WHEN 'Docker' THEN 7
+        WHEN 'AWS' THEN 8
+        ELSE 99
+    END as displayOrder,
+    true
+FROM skills s
+WHERE s.name IN ('React', 'Next.js', 'TypeScript', 'Node.js', 'Laravel', 'MongoDB', 'Docker', 'AWS')
+ON DUPLICATE KEY UPDATE skillId = skillId;
+
 -- 9. Work Experience Table
 CREATE TABLE IF NOT EXISTS work_experience (
     id INT AUTO_INCREMENT PRIMARY KEY,
     company VARCHAR(255) NOT NULL,
     position VARCHAR(255) NOT NULL,
     duration VARCHAR(100) NOT NULL,
+    location VARCHAR(100) DEFAULT 'Remote',
     description TEXT NOT NULL,
+    responsibilities JSON,
+    achievements JSON,
     logo VARCHAR(500),
+    companyUrl VARCHAR(500),
     technologies JSON,
     displayOrder INT DEFAULT 0,
     createdAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -488,12 +525,12 @@ ON DUPLICATE KEY UPDATE id = id;
 -- =============================================
 -- Insert Sample Work Experience Data
 -- =============================================
-INSERT INTO work_experience (company, position, duration, description, logo, technologies, displayOrder)
+INSERT INTO work_experience (company, position, duration, location, description, responsibilities, achievements, logo, companyUrl, technologies, displayOrder)
 VALUES 
-('Tech Solutions Inc.', 'Full Stack Developer', 'June 2023 - Present', 'Leading development of modern web applications using React, Next.js, and Node.js. Working with cross-functional teams to deliver high-quality software solutions.', 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=200&h=200&fit=crop', '["React", "Next.js", "Node.js", "TypeScript", "MongoDB", "Docker", "AWS"]', 1),
-('Digital Innovations Ltd.', 'Frontend Developer', 'March 2022 - May 2023', 'Developed responsive web applications and improved user experience across multiple products. Collaborated with designers to implement pixel-perfect interfaces.', 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=200&h=200&fit=crop', '["React", "Vue.js", "Tailwind CSS", "JavaScript", "REST API"]', 2),
-('Freelance Developer', 'Full Stack Developer', 'January 2021 - February 2022', 'Worked with various clients to build custom web applications, e-commerce platforms, and business websites. Managed projects from conception to deployment.', 'https://images.unsplash.com/photo-1487017159836-4e23ece2e4cf?w=200&h=200&fit=crop', '["React", "Node.js", "Express.js", "MongoDB", "PHP", "Laravel", "MySQL"]', 3),
-('StartUp Ventures', 'Junior Web Developer', 'August 2020 - December 2020', 'Started professional journey as a junior developer, learning modern web development practices and contributing to various projects.', 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&h=200&fit=crop', '["HTML", "CSS", "JavaScript", "React", "Git", "REST API"]', 4)
+('Tech Solutions Inc.', 'Full Stack Developer', 'June 2023 - Present', 'Remote', 'Leading development of modern web applications using React, Next.js, and Node.js. Working with cross-functional teams to deliver high-quality software solutions.', '["Architecting and developing scalable web applications", "Leading code reviews and mentoring junior developers", "Implementing CI/CD pipelines and DevOps practices"]', '["Reduced application load time by 40%", "Successfully delivered 5 major projects on time", "Implemented automated testing achieving 80% code coverage"]', 'https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=200&h=200&fit=crop', NULL, '["React", "Next.js", "Node.js", "TypeScript", "MongoDB", "Docker", "AWS"]', 1),
+('Digital Innovations Ltd.', 'Frontend Developer', 'March 2022 - May 2023', 'Hybrid', 'Developed responsive web applications and improved user experience across multiple products. Collaborated with designers to implement pixel-perfect interfaces.', '["Building responsive and accessible UI components", "Collaborating with UX/UI designers for seamless implementation", "Optimizing application performance and bundle size"]', '["Improved website performance score from 60 to 95", "Reduced CSS bundle size by 50%", "Launched 3 major product features"]', 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=200&h=200&fit=crop', NULL, '["React", "Vue.js", "Tailwind CSS", "JavaScript", "REST API"]', 2),
+('Freelance Developer', 'Full Stack Developer', 'January 2021 - February 2022', 'Remote', 'Worked with various clients to build custom web applications, e-commerce platforms, and business websites. Managed projects from conception to deployment.', '["Managing end-to-end project delivery", "Client communication and requirement gathering", "Building custom CMS and e-commerce solutions"]', '["Successfully completed 15+ client projects", "Maintained 100% client satisfaction rate", "Generated $50k+ in freelance revenue"]', 'https://images.unsplash.com/photo-1487017159836-4e23ece2e4cf?w=200&h=200&fit=crop', NULL, '["React", "Node.js", "Express.js", "MongoDB", "PHP", "Laravel", "MySQL"]', 3),
+('StartUp Ventures', 'Junior Web Developer', 'August 2020 - December 2020', 'On-site', 'Started professional journey as a junior developer, learning modern web development practices and contributing to various projects.', '["Developing and maintaining web pages", "Debugging and fixing issues", "Learning best practices and coding standards"]', '["Completed onboarding and became productive within 2 weeks", "Contributed to 3 product releases", "Received recognition for quick learning ability"]', 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&h=200&fit=crop', NULL, '["HTML", "CSS", "JavaScript", "React", "Git", "REST API"]', 4)
 ON DUPLICATE KEY UPDATE id = id;
 
 -- =============================================
@@ -531,14 +568,21 @@ CREATE TABLE IF NOT EXISTS skills_section (
     sectionBadge VARCHAR(100) DEFAULT 'What I Do Best',
     sectionTitle VARCHAR(255) NOT NULL DEFAULT 'Skills & Expertise',
     sectionDescription TEXT DEFAULT 'Technologies and tools I use to bring ideas to life',
+    -- Stat Cards
+    stat1Value VARCHAR(50) DEFAULT '16+',
+    stat1Label VARCHAR(100) DEFAULT 'Technologies Mastered',
+    stat2Value VARCHAR(50) DEFAULT '85%',
+    stat2Label VARCHAR(100) DEFAULT 'Average Proficiency',
+    stat3Value VARCHAR(50) DEFAULT '5+',
+    stat3Label VARCHAR(100) DEFAULT 'Years Learning',
     isActive BOOLEAN DEFAULT true,
     updatedAt TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CHECK (id = 1)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert Default Skills Section Data
-INSERT INTO skills_section (id, sectionBadge, sectionTitle, sectionDescription)
-VALUES (1, 'What I Do Best', 'Skills & Expertise', 'Technologies and tools I use to bring ideas to life')
+INSERT INTO skills_section (id, sectionBadge, sectionTitle, sectionDescription, stat1Value, stat1Label, stat2Value, stat2Label, stat3Value, stat3Label)
+VALUES (1, 'What I Do Best', 'Skills & Expertise', 'Technologies and tools I use to bring ideas to life', '16+', 'Technologies Mastered', '85%', 'Average Proficiency', '5+', 'Years Learning')
 ON DUPLICATE KEY UPDATE id = id;
 
 -- Experience Section Table (Single Row Configuration for Section Header)

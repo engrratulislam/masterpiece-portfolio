@@ -8,8 +8,12 @@ interface ExperienceRow extends RowDataPacket {
   company: string;
   position: string;
   duration: string;
+  location: string;
   description: string;
+  responsibilities: string;
+  achievements: string;
   logo: string | null;
+  companyUrl: string | null;
   technologies: string;
   displayOrder: number;
   createdAt: Date;
@@ -35,6 +39,8 @@ export async function GET() {
     const formattedExperiences = experiences.map((exp) => ({
       ...exp,
       technologies: exp.technologies ? JSON.parse(exp.technologies) : [],
+      responsibilities: exp.responsibilities ? JSON.parse(exp.responsibilities) : [],
+      achievements: exp.achievements ? JSON.parse(exp.achievements) : [],
       createdAt: exp.createdAt.toISOString(),
       updatedAt: exp.updatedAt.toISOString(),
     }));
@@ -65,7 +71,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { company, position, duration, description, logo, technologies, displayOrder } = body;
+    const { company, position, duration, location, description, responsibilities, achievements, logo, companyUrl, technologies, displayOrder } = body;
 
     // Validation
     if (!company || !position || !duration || !description) {
@@ -75,18 +81,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert technologies array to JSON string
+    // Convert arrays to JSON strings
     const technologiesJson = JSON.stringify(technologies || []);
+    const responsibilitiesJson = JSON.stringify(responsibilities || []);
+    const achievementsJson = JSON.stringify(achievements || []);
 
     const result = await executeQuery(
-      `INSERT INTO work_experience (company, position, duration, description, logo, technologies, displayOrder)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO work_experience (company, position, duration, location, description, responsibilities, achievements, logo, companyUrl, technologies, displayOrder)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         company,
         position,
         duration,
+        location || 'Remote',
         description,
+        responsibilitiesJson,
+        achievementsJson,
         logo || null,
+        companyUrl || null,
         technologiesJson,
         displayOrder || 0,
       ]

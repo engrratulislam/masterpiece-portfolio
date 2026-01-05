@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Save, User } from 'lucide-react';
+import { Save, User, Plus, X, ChevronUp, ChevronDown, Code2 } from 'lucide-react';
 import { toast, Toaster } from 'react-hot-toast';
 
 interface AboutData {
@@ -21,9 +21,34 @@ interface AboutData {
   isActive: boolean;
 }
 
+interface Skill {
+  id: number;
+  name: string;
+  level: number;
+  icon: string | null;
+  category: string;
+  isSelected: boolean;
+  displayOrder: number | null;
+  aboutSkillId: number | null;
+}
+
+interface SelectedSkill {
+  id: number;
+  skillId: number;
+  name: string;
+  level: number;
+  icon: string | null;
+  category: string;
+  displayOrder: number;
+}
+
 export default function AboutPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [skillsLoading, setSkillsLoading] = useState(true);
+  const [allSkills, setAllSkills] = useState<Skill[]>([]);
+  const [selectedSkills, setSelectedSkills] = useState<SelectedSkill[]>([]);
+  const [showSkillsSection, setShowSkillsSection] = useState(false);
   const [aboutData, setAboutData] = useState<AboutData>({
     id: 1,
     sectionBadge: '',
@@ -43,6 +68,7 @@ export default function AboutPage() {
 
   useEffect(() => {
     fetchAboutData();
+    fetchSkills();
   }, []);
 
   const fetchAboutData = async () => {
@@ -61,6 +87,97 @@ export default function AboutPage() {
       toast.error('Error loading about section');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSkills = async () => {
+    try {
+      const response = await fetch('/api/admin/about/skills');
+      if (response.ok) {
+        const data = await response.json();
+        if (data.data) {
+          setAllSkills(data.data.allSkills || []);
+          setSelectedSkills(data.data.selectedSkills || []);
+        }
+      } else {
+        toast.error('Failed to load skills');
+      }
+    } catch (error) {
+      console.error('Error fetching skills:', error);
+      toast.error('Error loading skills');
+    } finally {
+      setSkillsLoading(false);
+    }
+  };
+
+  const handleSkillToggle = async (skill: Skill) => {
+    try {
+      if (skill.isSelected) {
+        // Remove skill
+        const response = await fetch(`/api/admin/about/skills?skillId=${skill.id}`, {
+          method: 'DELETE',
+        });
+        
+        if (response.ok) {
+          toast.success(`${skill.name} removed from Tech Stack`);
+          fetchSkills(); // Refresh the list
+        } else {
+          toast.error('Failed to remove skill');
+        }
+      } else {
+        // Add skill
+        const response = await fetch('/api/admin/about/skills', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ skillId: skill.id }),
+        });
+        
+        if (response.ok) {
+          toast.success(`${skill.name} added to Tech Stack`);
+          fetchSkills(); // Refresh the list
+        } else {
+          toast.error('Failed to add skill');
+        }
+      }
+    } catch (error) {
+      console.error('Error toggling skill:', error);
+      toast.error('Error updating skill');
+    }
+  };
+
+  const moveSkill = async (skillId: number, direction: 'up' | 'down') => {
+    const index = selectedSkills.findIndex(s => s.skillId === skillId);
+    if (index === -1) return;
+    
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === selectedSkills.length - 1) return;
+    
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    const newSelectedSkills = [...selectedSkills];
+    [newSelectedSkills[index], newSelectedSkills[newIndex]] = [newSelectedSkills[newIndex], newSelectedSkills[index]];
+    
+    // Update display orders
+    const updatedSkills = newSelectedSkills.map((skill, idx) => ({
+      skillId: skill.skillId,
+      displayOrder: idx + 1,
+    }));
+    
+    try {
+      const response = await fetch('/api/admin/about/skills', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ skills: updatedSkills }),
+      });
+      
+      if (response.ok) {
+        setSelectedSkills(newSelectedSkills);
+        toast.success('Order updated');
+      } else {
+        toast.error('Failed to update order');
+      }
+    } catch (error) {
+      console.error('Error updating order:', error);
+      toast.error('Error updating order');
     }
   };
 
@@ -311,6 +428,140 @@ export default function AboutPage() {
                   </span>
                 </label>
               </div>
+            </div>
+
+            {/* Tech Stack Skills Section */}
+            <div className="pt-6 border-t border-[var(--color-dark-200)] space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-blue-500/10 rounded-lg">
+                    <Code2 className="w-5 h-5 text-blue-500" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-[var(--color-text-primary)]">
+                      Tech Stack & Expertise
+                    </h3>
+                    <p className="text-sm text-[var(--color-text-secondary)]">
+                      Select skills to display in the "Tech Stack & Expertise" section
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowSkillsSection(!showSkillsSection)}
+                  className="px-4 py-2 text-sm font-medium text-[var(--color-text-primary)] bg-[var(--color-dark-100)] hover:bg-[var(--color-dark-200)] rounded-lg transition-colors"
+                >
+                  {showSkillsSection ? 'Hide' : 'Manage Skills'}
+                </button>
+              </div>
+
+              {showSkillsSection && (
+                <div className="space-y-4">
+                  {/* Selected Skills with Reordering */}
+                  {selectedSkills.length > 0 && (
+                    <div className="bg-[var(--color-dark-100)] rounded-xl p-4">
+                      <h4 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
+                        Selected Skills ({selectedSkills.length})
+                      </h4>
+                      <div className="space-y-2">
+                        {selectedSkills.map((skill, index) => (
+                          <div
+                            key={skill.id}
+                            className="flex items-center justify-between p-3 bg-[var(--color-surface-light)] border border-[var(--color-dark-200)] rounded-lg"
+                          >
+                            <div className="flex items-center gap-3">
+                              {skill.icon && (
+                                skill.icon.startsWith('/') ? (
+                                  <img src={skill.icon} alt={skill.name} className="w-6 h-6 object-contain" />
+                                ) : (
+                                  <span className="text-2xl">{skill.icon}</span>
+                                )
+                              )}
+                              <div>
+                                <span className="font-medium text-[var(--color-text-primary)]">{skill.name}</span>
+                                <span className="text-xs text-[var(--color-text-secondary)] ml-2">
+                                  {skill.level}% • {skill.category}
+                                </span>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={() => moveSkill(skill.skillId, 'up')}
+                                disabled={index === 0}
+                                className="p-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-dark-100)] rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                title="Move up"
+                              >
+                                <ChevronUp className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveSkill(skill.skillId, 'down')}
+                                disabled={index === selectedSkills.length - 1}
+                                className="p-1.5 text-[var(--color-text-secondary)] hover:text-[var(--color-text-primary)] hover:bg-[var(--color-dark-100)] rounded transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                                title="Move down"
+                              >
+                                <ChevronDown className="w-4 h-4" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleSkillToggle({ ...skill, isSelected: true, aboutSkillId: skill.id, id: skill.skillId })}
+                                className="p-1.5 text-red-500 hover:bg-red-500/10 rounded transition-colors"
+                                title="Remove"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* All Skills Selection */}
+                  <div className="bg-[var(--color-dark-100)] rounded-xl p-4">
+                    <h4 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">
+                      All Skills (Click to add/remove)
+                    </h4>
+                    {skillsLoading ? (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        {[...Array(6)].map((_, i) => (
+                          <div key={i} className="h-12 bg-[var(--color-dark-200)] animate-pulse rounded-lg" />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-96 overflow-y-auto">
+                        {allSkills.map((skill) => (
+                          <button
+                            key={skill.id}
+                            type="button"
+                            onClick={() => handleSkillToggle(skill)}
+                            className={`flex items-center gap-2 p-2.5 rounded-lg text-left transition-all ${
+                              skill.isSelected
+                                ? 'bg-blue-500/20 border-2 border-blue-500 text-[var(--color-text-primary)]'
+                                : 'bg-[var(--color-surface-light)] border-2 border-[var(--color-dark-200)] text-[var(--color-text-secondary)] hover:border-[var(--color-dark-300)] hover:text-[var(--color-text-primary)]'
+                            }`}
+                          >
+                            {skill.icon && (
+                              skill.icon.startsWith('/') ? (
+                                <img src={skill.icon} alt={skill.name} className="w-5 h-5 object-contain" />
+                              ) : (
+                                <span className="text-lg">{skill.icon}</span>
+                              )
+                            )}
+                            <span className="text-sm font-medium truncate">{skill.name}</span>
+                            {skill.isSelected && (
+                              <div className="ml-auto flex-shrink-0 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                <Plus className="w-3 h-3 text-white rotate-45" />
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Submit Button */}

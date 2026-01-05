@@ -83,7 +83,67 @@ export default function Experience() {
   }
 
   const calculateDuration = (start: string, end: string) => {
-    return '1 yr'
+    try {
+      // Parse month names to numbers
+      const monthMap: { [key: string]: number } = {
+        'january': 0, 'jan': 0,
+        'february': 1, 'feb': 1,
+        'march': 2, 'mar': 2,
+        'april': 3, 'apr': 3,
+        'may': 4,
+        'june': 5, 'jun': 5,
+        'july': 6, 'jul': 6,
+        'august': 7, 'aug': 7,
+        'september': 8, 'sep': 8, 'sept': 8,
+        'october': 9, 'oct': 9,
+        'november': 10, 'nov': 10,
+        'december': 11, 'dec': 11
+      }
+
+      const parseDate = (dateStr: string): Date => {
+        if (dateStr.toLowerCase() === 'present') {
+          return new Date()
+        }
+        // Handle formats like "June 2023", "Jun 2023", "2023"
+        const parts = dateStr.trim().split(/\s+/)
+        if (parts.length === 2) {
+          const month = monthMap[parts[0].toLowerCase()]
+          const year = parseInt(parts[1])
+          if (month !== undefined && !isNaN(year)) {
+            return new Date(year, month, 1)
+          }
+        } else if (parts.length === 1 && !isNaN(parseInt(parts[0]))) {
+          // Just year like "2023"
+          return new Date(parseInt(parts[0]), 0, 1)
+        }
+        return new Date()
+      }
+
+      const startDate = parseDate(start)
+      const endDate = parseDate(end)
+
+      // Calculate difference in months
+      let months = (endDate.getFullYear() - startDate.getFullYear()) * 12
+      months += endDate.getMonth() - startDate.getMonth()
+      
+      // Add 1 to include both start and end months
+      months = Math.max(1, months + 1)
+
+      const years = Math.floor(months / 12)
+      const remainingMonths = months % 12
+
+      if (years === 0) {
+        return `${remainingMonths}mo`
+      } else if (remainingMonths === 0) {
+        return years === 1 ? '1yr' : `${years}yrs`
+      } else {
+        const yearStr = years === 1 ? '1yr' : `${years}yrs`
+        return `${yearStr} ${remainingMonths}mo`
+      }
+    } catch (error) {
+      console.error('Error calculating duration:', error)
+      return ''
+    }
   }
 
   return (

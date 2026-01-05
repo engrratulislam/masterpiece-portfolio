@@ -29,6 +29,12 @@ interface SkillsSection {
   sectionBadge: string;
   sectionTitle: string;
   sectionDescription: string;
+  stat1Value: string;
+  stat1Label: string;
+  stat2Value: string;
+  stat2Label: string;
+  stat3Value: string;
+  stat3Label: string;
   isActive: boolean;
 }
 
@@ -44,6 +50,12 @@ export default function SkillsPage() {
     sectionBadge: 'What I Do Best',
     sectionTitle: 'Skills & Expertise',
     sectionDescription: 'Technologies and tools I use to bring ideas to life',
+    stat1Value: '16+',
+    stat1Label: 'Technologies Mastered',
+    stat2Value: '85%',
+    stat2Label: 'Average Proficiency',
+    stat3Value: '5+',
+    stat3Label: 'Years Learning',
     isActive: true,
   });
   const [savingSection, setSavingSection] = useState(false);
@@ -89,7 +101,20 @@ export default function SkillsPage() {
       const response = await fetch('/api/admin/skills-section');
       if (response.ok) {
         const data = await response.json();
-        setSectionData(data.data);
+        // Ensure all fields have default values to prevent uncontrolled input warning
+        setSectionData({
+          id: data.data.id || 1,
+          sectionBadge: data.data.sectionBadge || 'What I Do Best',
+          sectionTitle: data.data.sectionTitle || 'Skills & Expertise',
+          sectionDescription: data.data.sectionDescription || 'Technologies and tools I use to bring ideas to life',
+          stat1Value: data.data.stat1Value || '16+',
+          stat1Label: data.data.stat1Label || 'Technologies Mastered',
+          stat2Value: data.data.stat2Value || '85%',
+          stat2Label: data.data.stat2Label || 'Average Proficiency',
+          stat3Value: data.data.stat3Value || '5+',
+          stat3Label: data.data.stat3Label || 'Years Learning',
+          isActive: data.data.isActive !== undefined ? data.data.isActive : true,
+        });
       }
     } catch (error) {
       console.error('Error fetching section:', error);
@@ -217,7 +242,7 @@ export default function SkillsPage() {
                 </label>
                 <input
                   type="text"
-                  value={sectionData.sectionBadge}
+                  value={sectionData.sectionBadge || ''}
                   onChange={(e) => setSectionData({ ...sectionData, sectionBadge: e.target.value })}
                   className="w-full px-4 py-3 bg-[var(--color-dark-100)] border border-[var(--color-dark-200)] rounded-xl text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500"
                   placeholder="What I Do Best"
@@ -229,7 +254,7 @@ export default function SkillsPage() {
                 </label>
                 <input
                   type="text"
-                  value={sectionData.sectionTitle}
+                  value={sectionData.sectionTitle || ''}
                   onChange={(e) => setSectionData({ ...sectionData, sectionTitle: e.target.value })}
                   className="w-full px-4 py-3 bg-[var(--color-dark-100)] border border-[var(--color-dark-200)] rounded-xl text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500"
                   placeholder="Skills & Expertise"
@@ -242,13 +267,116 @@ export default function SkillsPage() {
                 Section Description
               </label>
               <textarea
-                value={sectionData.sectionDescription}
+                value={sectionData.sectionDescription || ''}
                 onChange={(e) => setSectionData({ ...sectionData, sectionDescription: e.target.value })}
                 className="w-full px-4 py-3 bg-[var(--color-dark-100)] border border-[var(--color-dark-200)] rounded-xl text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[100px] resize-y"
                 placeholder="Technologies and tools I use to bring ideas to life"
                 required
               />
             </div>
+
+            {/* Stat Cards Section */}
+            <div className="pt-4 border-t border-[var(--color-dark-200)]">
+              <h3 className="text-lg font-semibold text-[var(--color-text-primary)] mb-4 flex items-center gap-2">
+                <TrendingUp className="w-5 h-5 text-orange-500" />
+                Stats Cards (3 Cards)
+              </h3>
+              <div className="space-y-4">
+                {/* Stat Card 1 */}
+                <div className="bg-[var(--color-dark-100)] rounded-xl p-4">
+                  <h4 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">Stat Card 1</h4>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-2">
+                        Value
+                      </label>
+                      <input
+                        type="text"
+                        value={sectionData.stat1Value || ''}
+                        onChange={(e) => setSectionData({ ...sectionData, stat1Value: e.target.value })}
+                        className="w-full px-3 py-2 bg-[var(--color-surface-light)] border border-[var(--color-dark-200)] rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                        placeholder="16+"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-2">
+                        Label
+                      </label>
+                      <input
+                        type="text"
+                        value={sectionData.stat1Label || ''}
+                        onChange={(e) => setSectionData({ ...sectionData, stat1Label: e.target.value })}
+                        className="w-full px-3 py-2 bg-[var(--color-surface-light)] border border-[var(--color-dark-200)] rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                        placeholder="Technologies Mastered"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stat Card 2 */}
+                <div className="bg-[var(--color-dark-100)] rounded-xl p-4">
+                  <h4 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">Stat Card 2</h4>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-2">
+                        Value
+                      </label>
+                      <input
+                        type="text"
+                        value={sectionData.stat2Value || ''}
+                        onChange={(e) => setSectionData({ ...sectionData, stat2Value: e.target.value })}
+                        className="w-full px-3 py-2 bg-[var(--color-surface-light)] border border-[var(--color-dark-200)] rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                        placeholder="85%"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-2">
+                        Label
+                      </label>
+                      <input
+                        type="text"
+                        value={sectionData.stat2Label || ''}
+                        onChange={(e) => setSectionData({ ...sectionData, stat2Label: e.target.value })}
+                        className="w-full px-3 py-2 bg-[var(--color-surface-light)] border border-[var(--color-dark-200)] rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                        placeholder="Average Proficiency"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Stat Card 3 */}
+                <div className="bg-[var(--color-dark-100)] rounded-xl p-4">
+                  <h4 className="text-sm font-semibold text-[var(--color-text-primary)] mb-3">Stat Card 3</h4>
+                  <div className="grid md:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-2">
+                        Value
+                      </label>
+                      <input
+                        type="text"
+                        value={sectionData.stat3Value || ''}
+                        onChange={(e) => setSectionData({ ...sectionData, stat3Value: e.target.value })}
+                        className="w-full px-3 py-2 bg-[var(--color-surface-light)] border border-[var(--color-dark-200)] rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                        placeholder="5+"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-[var(--color-text-secondary)] mb-2">
+                        Label
+                      </label>
+                      <input
+                        type="text"
+                        value={sectionData.stat3Label || ''}
+                        onChange={(e) => setSectionData({ ...sectionData, stat3Label: e.target.value })}
+                        className="w-full px-3 py-2 bg-[var(--color-surface-light)] border border-[var(--color-dark-200)] rounded-lg text-[var(--color-text-primary)] focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                        placeholder="Years Learning"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="flex justify-end">
               <button
                 type="submit"

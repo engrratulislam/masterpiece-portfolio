@@ -7,6 +7,12 @@ interface SkillsSectionRow extends RowDataPacket {
   sectionBadge: string;
   sectionTitle: string;
   sectionDescription: string;
+  stat1Value: string;
+  stat1Label: string;
+  stat2Value: string;
+  stat2Label: string;
+  stat3Value: string;
+  stat3Label: string;
   isActive: boolean;
 }
 
@@ -24,9 +30,20 @@ export async function GET() {
       );
     }
 
+    // Ensure stat fields have default values if columns don't exist yet
+    const data = {
+      ...section[0],
+      stat1Value: section[0].stat1Value || '16+',
+      stat1Label: section[0].stat1Label || 'Technologies Mastered',
+      stat2Value: section[0].stat2Value || '85%',
+      stat2Label: section[0].stat2Label || 'Average Proficiency',
+      stat3Value: section[0].stat3Value || '5+',
+      stat3Label: section[0].stat3Label || 'Years Learning',
+    };
+
     return NextResponse.json({
       success: true,
-      data: section[0],
+      data,
     });
   } catch (error) {
     console.error('[SKILLS_SECTION_GET]', error);

@@ -36,6 +36,12 @@ interface SkillsSection {
   sectionBadge: string
   sectionTitle: string
   sectionDescription: string
+  stat1Value: string
+  stat1Label: string
+  stat2Value: string
+  stat2Label: string
+  stat3Value: string
+  stat3Label: string
 }
 
 export default function Skills() {
@@ -47,6 +53,12 @@ export default function Skills() {
     sectionBadge: 'What I Do Best',
     sectionTitle: 'Skills & Expertise',
     sectionDescription: 'Technologies and tools I use to bring ideas to life',
+    stat1Value: '16+',
+    stat1Label: 'Technologies Mastered',
+    stat2Value: '85%',
+    stat2Label: 'Average Proficiency',
+    stat3Value: '5+',
+    stat3Label: 'Years Learning',
   })
 
   useEffect(() => {
@@ -255,9 +267,9 @@ export default function Skills() {
         {/* Stats */}
         <div className="grid md:grid-cols-3 gap-6 mt-20 max-w-4xl mx-auto">
           {[
-            { value: `${skills.length}+`, label: 'Technologies Mastered' },
-            { value: loading ? '...' : `${Math.round(skills.reduce((acc, s) => acc + s.level, 0) / skills.length || 90)}%`, label: 'Average Proficiency' },
-            { value: '5+', label: 'Years Learning' },
+            { value: sectionData.stat1Value, label: sectionData.stat1Label },
+            { value: sectionData.stat2Value, label: sectionData.stat2Label },
+            { value: sectionData.stat3Value, label: sectionData.stat3Label },
           ].map((stat, index) => (
             <ScrollReveal key={index} direction="up" delay={index * 0.1}>
               <div className="card-elevated text-center">
